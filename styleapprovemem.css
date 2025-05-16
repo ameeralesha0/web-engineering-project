@@ -1,0 +1,96 @@
+body {
+    display: flex;
+    font-family: Arial;
+    background-color: white;
+    margin: 0;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #c6dbef;
+    padding: 20px;
+    height: 100vh;
+}
+
+.sidebar button, .sidebar img {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sidebar .blue-btn {
+    background: #0275d8;
+    color: white;
+}
+.sidebar .blue-btn:hover {
+    background: #025aa5;
+}
+
+.back-btn {
+    background: #6c757d;
+    color: white;
+}
+.back-btn:hover {
+    background: #495057;
+}
+
+.logout {
+    background: #d9534f;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.logout:hover {
+    background: #c9302c;
+}
+
+.main {
+    flex-grow: 1;
+    padding: 30px;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-bar .title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.application {
+    margin-top: 30px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+}
+.application img {
+    max-width: 150px;
+    margin-bottom: 10px;
+}
+.application form {
+    margin-top: 10px;
+}
+
+.approve-btn {
+    background: green;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.approve-btn:hover {
+    background: darkgreen;
+}
+
+.success {
+    color: green;
+}
