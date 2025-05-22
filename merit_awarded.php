@@ -1,166 +1,231 @@
+<?php
+session_start();
+
+// Redirect if not logged in or not a student
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+    header("Location: login.php");
+    exit();
+}
+
+require_once 'config/db.php'; // Include the PDO database connection file
+
+$studentID = $_SESSION['user_id'];
+$meritList = [];
+$totalMeritAwarded = 0;
+$selectedSemester = $_GET['semester'] ?? 'All'; // Get selected semester from query string
+
+try {
+    $sql = "SELECT am.event_name, am.role_in_event, am.event_level, am.event_date, am.merit_points
+            FROM awarded_merits am
+            WHERE am.student_id = :student_id";
+
+    // Add semester filter if a specific semester is selected
+    if ($selectedSemester !== 'All') {
+        // You'll need a way to link events to semesters. This is an example assuming an 'events' table with 'semester' column.
+        // Or if awarded_merits has a semester column directly.
+        // For now, I'll assume awarded_merits might have a semester column, or you join with an events table.
+        // Let's assume there's a 'semester' column in 'awarded_merits' for simplicity.
+        $sql .= " AND am.semester = :semester";
+    }
+
+    $stmt = $pdo->prepare($sql . " ORDER BY am.event_date DESC");
+    $stmt->bindValue(':student_id', $studentID);
+
+    if ($selectedSemester !== 'All') {
+        $stmt->bindValue(':semester', $selectedSemester);
+    }
+    $stmt->execute();
+    $meritList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Calculate total merit
+    $stmt_total_merit = $pdo->prepare("SELECT SUM(merit_points) AS total_points FROM awarded_merits WHERE student_id = :student_id");
+    $stmt_total_merit->execute([':student_id' => $studentID]);
+    $totalMeritAwarded = $stmt_total_merit->fetch(PDO::FETCH_ASSOC)['total_points'] ?? 0;
+
+    // Fetch available semesters for the dropdown (assuming from a relevant table or distinct from awarded_merits)
+    $stmt_semesters = $pdo->prepare("SELECT DISTINCT semester FROM awarded_merits WHERE student_id = :student_id ORDER BY semester DESC");
+    $stmt_semesters->execute([':student_id' => $studentID]);
+    $availableSemesters = $stmt_semesters->fetchAll(PDO::FETCH_COLUMN);
+
+} catch (PDOException $e) {
+    error_log("Error fetching awarded merits: " . $e->getMessage());
+    echo "<p style='color: red; text-align: center;'>An error occurred while loading merit data. Please try again.</p>";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merit Awarded</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Merit Awarded - MyPetakom</title>
+    <link rel="stylesheet" href="stylepage.css">
+    <style>
+        /* Specific styles for merit_awarded.php */
+        .merit-awarded-container {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .filter-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .filter-section label {
+            font-weight: bold;
+            color: #333;
+        }
+        .filter-section select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            flex-grow: 1; /* Allow dropdown to take space */
+            max-width: 200px; /* Limit dropdown width */
+        }
+        .merit-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .merit-table th, .merit-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .merit-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+        .merit-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .merit-table tbody tr:hover {
+            background-color: #e9e9e9;
+        }
+        .total-merit {
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .merit-awarded-actions {
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .merit-awarded-actions button,
+        .merit-awarded-actions a {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* For links styled as buttons */
+            color: white; /* For links styled as buttons */
+            display: inline-flex; /* For links to center content if needed */
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+        .merit-awarded-actions .download-btn {
+            background-color: #17a2b8; /* Info blue */
+        }
+        .merit-awarded-actions .download-btn:hover {
+            background-color: #138496;
+        }
+        .merit-awarded-actions .qr-code-btn {
+            background-color: #6f42c1; /* Purple */
+        }
+        .merit-awarded-actions .qr-code-btn:hover {
+            background-color: #563d7c;
+        }
+        .merit-awarded-actions .back-btn {
+            background-color: #6c757d;
+        }
+        .merit-awarded-actions .back-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <div class="logo">
-            <img src="images/mypetakom_logo.png" alt="Mypetakom Logo">
-        </div>
+        <img src="images/mypetakom_logo.png" alt="MyPetakom Logo" class="logo">
         <h1>Merit Awarded</h1>
-        <button class="logout-button">Logout</button>
+        <a href="logout.php" class="logout-btn">Logout</a>
     </header>
 
-    <main>
-        <div class="merit-list-filter">
-            <p class="merit-list-title">My merit list (semester:
-                <select id="semesterFilter" onchange="filterMerits(this.value)">
-                    <option value="">All Semesters</option>
-                    <?php
-                        // Include database connection (replace with your actual connection details)
-                        $servername = "localhost";
-                        $username = "your_db_username";
-                        $password = "your_db_password";
-                        $dbname = "your_db_name";
+    <main class="merit-awarded-container">
+        <section class="filter-section">
+            <p>My merit list (semester: </p>
+            <select id="semester_dropdown" onchange="filterMerits()">
+                <option value="All" <?php echo ($selectedSemester === 'All') ? 'selected' : ''; ?>>All</option>
+                <?php foreach ($availableSemesters as $semester): ?>
+                    <option value="<?php echo htmlspecialchars($semester); ?>" <?php echo ($selectedSemester === $semester) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($semester); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <p>)</p>
+        </section>
 
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-
-                        // Check connection
-                        if ($conn->connect_error) {
-                            die("Connection failed: " . $conn->connect_error);
-                        }
-
-                        // Assuming you have a way to get distinct semesters for the student
-                        $studentID = "[USER_ID]"; // Replace with actual student ID from session
-                        $sql_semesters = "SELECT DISTINCT semester FROM awarded_merits WHERE student_id = ?";
-                        $stmt_semesters = $conn->prepare($sql_semesters);
-                        $stmt_semesters->bind_param("s", $studentID);
-                        $stmt_semesters->execute();
-                        $result_semesters = $stmt_semesters->get_result();
-
-                        if ($result_semesters->num_rows > 0) {
-                            while ($row_semester = $result_semesters->fetch_assoc()) {
-                                echo "<option value='" . htmlspecialchars($row_semester["semester"]) . "'>" . htmlspecialchars($row_semester["semester"]) . "</option>";
-                            }
-                        }
-
-                        $stmt_semesters->close();
-                        // $conn->close(); // Connection will be closed later
-                    ?>
-                </select>)
-            </p>
-        </div>
-
-        <div class="merit-list-container">
-            <table>
-                <thead>
+        <table class="merit-table">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Role</th>
+                    <th>Level</th>
+                    <th>Date</th>
+                    <th>Merit Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (count($meritList) > 0): ?>
+                    <?php foreach ($meritList as $merit): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($merit['event_name']); ?></td>
+                            <td><?php echo htmlspecialchars($merit['role_in_event']); ?></td>
+                            <td><?php echo htmlspecialchars($merit['event_level']); ?></td>
+                            <td><?php echo htmlspecialchars($merit['event_date']); ?></td>
+                            <td><?php echo htmlspecialchars($merit['merit_points']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <tr>
-                        <th>Event Name</th>
-                        <th>Role</th>
-                        <th>Level</th>
-                        <th>Date</th>
-                        <th>Merit Points</th>
+                        <td colspan="5" style="text-align: center;">No merits awarded yet or for the selected semester.</td>
                     </tr>
-                </thead>
-                <tbody id="meritTableBody">
-                    <?php
-                        // Fetch awarded merits for the current student (initially, all semesters)
-                        $sql_merits = "SELECT event_name, role_in_event, event_level, award_date, merit_points FROM awarded_merits WHERE student_id = ?";
-                        $stmt_merits = $conn->prepare($sql_merits);
-                        $stmt_merits->bind_param("s", $studentID);
-                        $stmt_merits->execute();
-                        $result_merits = $stmt_merits->get_result();
+                <?php endif; ?>
+            </tbody>
+        </table>
 
-                        if ($result_merits->num_rows > 0) {
-                            while ($row_merit = $result_merits->fetch_assoc()) {
-                                echo "<tr data-semester='" . htmlspecialchars($row_merit["semester"]) . "'>";
-                                echo "<td>" . htmlspecialchars($row_merit["event_name"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row_merit["role_in_event"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row_merit["event_level"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row_merit["award_date"]) . "</td>";
-                                echo "<td class='merit-points'>" . htmlspecialchars($row_merit["merit_points"]) . "</td>";
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='5'>No merits awarded yet.</td></tr>";
-                        }
-
-                        $stmt_merits->close();
-                        $conn->close();
-                    ?>
-                </tbody>
-            </table>
+        <div class="total-merit">
+            Total Merit: <?php echo htmlspecialchars($totalMeritAwarded); ?>
         </div>
 
-        <div class="total-merit-container">
-            <p class="total-merit-text">Total Merit: <span id="totalMeritPoints">
-                <?php
-                    // Calculate and display total merit points
-                    $sql_total_merit = "SELECT SUM(merit_points) AS total_points FROM awarded_merits WHERE student_id = ?";
-                    $stmt_total_merit = $conn->prepare($sql_total_merit);
-                    $stmt_total_merit->bind_param("s", $studentID);
-                    $stmt_total_merit->execute();
-                    $result_total_merit = $stmt_total_merit->get_result();
-
-                    if ($row_total_merit = $result_total_merit->fetch_assoc()) {
-                        echo htmlspecialchars($row_total_merit["total_points"] ?: 0);
-                    } else {
-                        echo "0";
-                    }
-
-                    $stmt_total_merit->close();
-                ?>
-            </span></p>
-        </div>
-
-        <div class="actions-container">
-            <a class="download-pdf-link" href="#">Download PDF</a>
-            <a class="qr-code-link" href="#">QR Code</a>
-            <button class="back-button">Back</button>
-        </div>
+        <section class="merit-awarded-actions">
+            <button class="download-btn" onclick="alert('Download PDF functionality to be implemented.')">Download PDF</button>
+            <button class="qr-code-btn" onclick="alert('QR Code generation functionality to be implemented.')">QR Code</button>
+            <button class="back-btn" onclick="location.href='student_homepage.php'">Back</button>
+        </section>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const backButton = document.querySelector('.back-button');
-            if (backButton) {
-                backButton.addEventListener('click', function() {
-                    window.history.back();
-                });
-            }
-
-            const logoutButton = document.querySelector('.logout-button');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', function() {
-                    alert('Logging out (this is a simulation)');
-                    window.location.href = '/login';
-                });
-            }
-        });
-
-        function filterMerits(semester) {
-            const tableRows = document.querySelectorAll('#meritTableBody tr');
-            let totalPoints = 0;
-
-            tableRows.forEach(row => {
-                const rowSemester = row.getAttribute('data-semester');
-                const meritPointsCell = row.querySelector('.merit-points');
-
-                if (semester === '' || rowSemester === semester) {
-                    row.style.display = '';
-                    if (meritPointsCell && !isNaN(parseInt(meritPointsCell.textContent))) {
-                        totalPoints += parseInt(meritPointsCell.textContent);
-                    }
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            document.getElementById('totalMeritPoints').textContent = totalPoints;
+        function filterMerits() {
+            const semester = document.getElementById('semester_dropdown').value;
+            window.location.href = 'merit_awarded.php?semester=' + semester;
         }
     </script>
 </body>
