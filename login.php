@@ -61,7 +61,7 @@ $conn->close();
         <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
         <h2>Login to MyPetakom</h2>
         <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
-        <form method="post">
+        <form method="post" action="login.php">
             <input type="text" name="username" placeholder="Username" required value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
             <input type="password" name="password" placeholder="Password" required>
             <select name="role" required>
