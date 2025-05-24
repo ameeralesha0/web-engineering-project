@@ -35,12 +35,12 @@ if (isset($_POST['login'])) {
             $stmt->fetch();
 
             // If using hashed passwords, verify with password_verify
-            if (password_verify($password, $hashed_pass)) {
+            if ($password === $hashed_pass) {
                 $_SESSION['user_id'] = $id;
                 $_SESSION['role'] = $role;
 
                 if ($role === "student") {
-                    header("Location: claim_merit.php");
+                    header("Location: studentpage.php");
                 } elseif ($role === "advisor") {
                     header("Location: advisorpage.php");
                 } else {
@@ -56,6 +56,9 @@ if (isset($_POST['login'])) {
 
         $stmt->close();
     }
+    echo "Form submitted!";
+    exit();
+
 }
 
 mysqli_close($conn);
