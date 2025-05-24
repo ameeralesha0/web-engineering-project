@@ -14,53 +14,28 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
     $role = $_POST['role'];
 
-    if ($role === "student") {
-        $query = "SELECT student_id, student_pass FROM student WHERE student_username = ?";
-    } elseif ($role === "advisor") {
-        $query = "SELECT advisor_id, advisor_pass FROM advisor WHERE advisor_username = ?";
-    } elseif ($role === "coordinator") {
-        $query = "SELECT staff_id, staff_pass FROM petakom_coordinator WHERE staff_username = ?";
-    } else {
-        $error = "Invalid role selected.";
-    }
+    // Prepare statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT student_id, student_pass FROM student WHERE student_username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
 
-    if (!isset($error)) {
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
+    if ($stmt->num_rows === 1) {
+        $stmt->bind_result($student_id, $hashed_pass);
+        $stmt->fetch();
 
-        if ($stmt->num_rows === 1) {
-            $stmt->bind_result($id, $hashed_pass);
-            $stmt->fetch();
-
-            // If using hashed passwords, verify with password_verify
-            if ($password === $hashed_pass) {
-                $_SESSION['user_id'] = $id;
-                $_SESSION['role'] = $role;
-
-                if ($role === "student") {
-                    header("Location: studentpage.php");
-                } elseif ($role === "advisor") {
-                    header("Location: advisorpage.php");
-                } else {
-                    header("Location: coordinatorpage.php");
-                }
-                exit();
-            } else {
-                $error = "Invalid password.";
-            }
+        if (password_verify($password, $hashed_pass)) {
+            $_SESSION['student_id'] = $student_id;
+            header("Location: studentpage.php");
+            exit();
         } else {
-            $error = "Username not found.";
+            $error = "Invalid password.";
         }
-
-        $stmt->close();
+    } else {
+        $error = "Username not found.";
     }
-    echo "Form submitted!";
-    exit();
-
+    $stmt->close();
 }
-
 mysqli_close($conn);
 ?>
 
