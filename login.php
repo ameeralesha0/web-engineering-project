@@ -19,50 +19,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = $_POST['password'];
         $role = $_POST['role'];
 
-        // Validate role
         if (!array_key_exists($role, $redirect_pages)) {
             $error = "Invalid role selected.";
         } else {
             // Prepare SQL based on role
             switch ($role) {
                 case 'student':
-                    $table = 'student';
-                    $user_col = 'student_username';
-                    $pass_col = 'student_pass';
+                    $sql = "SELECT * FROM student WHERE student_username = ? AND student_pass = ?";
                     break;
                 case 'advisor':
-                    $table = 'advisor';
-                    $user_col = 'advisor_username';
-                    $pass_col = 'advisor_pass';
+                    $sql = "SELECT * FROM advisor WHERE advisor_username = ? AND advisor_pass = ?";
                     break;
                 case 'coordinator':
-                    $table = 'petakom_coordinator';
-                    $user_col = 'staff_username';
-                    $pass_col = 'staff_pass';
+                    $sql = "SELECT * FROM petakom_coordinator WHERE staff_username = ? AND staff_pass = ?";
                     break;
             }
 
-            $sql = "SELECT $pass_col FROM $table WHERE $user_col = ? LIMIT 1";
-
             if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("s", $username);
+                $stmt->bind_param("ss", $username, $password);
                 $stmt->execute();
-                $stmt->store_result();
+                $result = $stmt->get_result();
 
-                if ($stmt->num_rows === 1) {
-                    $stmt->bind_result($hashed_password);
-                    $stmt->fetch();
-
-                    // Verify password using password_verify()
-                    if (password_verify($password, $hashed_password)) {
-                        // Successful login
-                        $_SESSION['username'] = $username;
-                        $_SESSION['role'] = $role;
-                        header("Location: " . $redirect_pages[$role]);
-                        exit();
-                    } else {
-                        $error = "Invalid username or password.";
-                    }
+                if ($result->num_rows === 1) {
+                    $_SESSION['username'] = $username;
+                    $_SESSION['role'] = $role;
+                    header("Location: " . $redirect_pages[$role]);
+                    exit();
                 } else {
                     $error = "Invalid username or password.";
                 }
@@ -111,4 +93,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 </body>
 </html>
-
