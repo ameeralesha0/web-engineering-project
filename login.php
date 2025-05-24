@@ -1,16 +1,6 @@
 <?php
 session_start();
-$host = "localhost";
-$username = "root"; // update if different
-$password = ""; // update if different
-$database = "petakom_system";
-
-$conn = new mysqli($host, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include 'db_connection.php';
 
 // Check if all required POST data is present
 if (!isset($_POST['email'], $_POST['password'], $_POST['role'])) {
