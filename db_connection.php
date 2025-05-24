@@ -1,5 +1,5 @@
 <?php
-$host = "localhost";
+$host = "127.0.0.1:3307";
 $username = "root"; // update if different
 $password = ""; // update if different
 $database = "mypetakom";
