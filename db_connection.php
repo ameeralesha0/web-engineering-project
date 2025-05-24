@@ -2,7 +2,7 @@
 $host = "localhost";
 $username = "root"; // update if different
 $password = ""; // update if different
-$database = "petakom_system";
+$database = "mypetakom";
 
 $conn = new mysqli($host, $username, $password, $database);
 
