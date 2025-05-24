@@ -2,38 +2,50 @@
 session_start();
 include 'db_connection.php';
 
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+// Check if all required POST data is present
+if (!isset($_POST['email'], $_POST['password'], $_POST['role'])) {
+    die("Missing required form fields.");
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $role = $_POST['role'];
+$email = $_POST['email'];
+$password = $_POST['password'];
+$role = $_POST['role'];
 
-    // Determine table and column names based on role
-    if ($role === 'student') {
-        $table = 'student';
-        $username_col = 'student_username';
-        $password_col = 'student_pass';
-        $redirect = 'studentpage.php';
-    } elseif ($role === 'advisor') {
-        $table = 'advisor';
-        $username_col = 'advisor_username';
-        $password_col = 'advisor_pass';
-        $redirect = 'advisorpage.php';
-    } elseif ($role === 'coordinator') {
-        $table = 'petakom_coordinator';
-        $username_col = 'staff_username';
-        $password_col = 'staff_pass';
-        $redirect = 'coordinatorpage.php';
-    } else {
-        $error = "Invalid credentials.";
-        exit();
-    }
+// Determine SQL based on role
+if ($role == 'student') {
+    $sql = "SELECT * FROM student WHERE student_email = ? AND student_pass = ?";
+} elseif ($role == 'advisor') {
+    $sql = "SELECT * FROM advisor WHERE advisor_email = ? AND advisor_pass = ?";
+} elseif ($role == 'coordinator') {
+    $sql = "SELECT * FROM petakom_coordinator WHERE staff_email = ? AND staff_pass = ?";
+} else {
+    die("Invalid role selected.");
 }
-mysqli_close($conn);
+// Prepare and execute the SQL query
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("SQL error: " . $conn->error);
+}
+
+$stmt->bind_param("ss", $email, $password);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Check if user exists
+if ($result->num_rows === 1) {
+    $_SESSION['email'] = $email;
+    $_SESSION['role'] = $role;
+    
+    // Redirect to dashboard (customize this per role if needed)
+    header("Location: register.html");
+    exit();
+} else {
+    // Invalid login
+    echo "<script>alert('Invalid credentials.'); window.location.href='login.php';</script>";
+}
+
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
