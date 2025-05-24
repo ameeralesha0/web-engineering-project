@@ -1,10 +1,10 @@
 <?php
-$host = "127.0.0.1:3307";
+$host = "localhost";
 $username = "root"; // update if different
 $password = ""; // update if different
 $database = "mypetakom";
 
-$conn = new mysqli($host, $username, $password, $database);
+$conn = new mysqli($host, $username, $password, $database , 3307);
 
 // Check connection
 if ($conn->connect_error) {
