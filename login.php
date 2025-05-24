@@ -1,42 +1,43 @@
 <?php
 session_start();
+$host = "localhost";
+$username = "root";      // use your DB username
+$password = "";          // use your DB password
+$database = "mypetakom";   // your DB name
 
-// Connect using mysqli
-$conn = mysqli_connect("127.0.0.1:3307", "root", "", "student");
+$conn = new mysqli($host, $username, $password, $database);
 
 // Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $role = $_POST['role'];
 
-    // Determine table and column names based on role
-    if ($role === 'student') {
-        $table = 'student';
-        $username_col = 'student_username';
-        $password_col = 'student_pass';
-        $redirect = 'studentpage.php';
-    } elseif ($role === 'advisor') {
-        $table = 'advisor';
-        $username_col = 'advisor_username';
-        $password_col = 'advisor_pass';
-        $redirect = 'advisorpage.php';
-    } elseif ($role === 'coordinator') {
-        $table = 'petakom_coordinator';
-        $username_col = 'staff_username';
-        $password_col = 'staff_pass';
-        $redirect = 'coordinatorpage.php';
+    // Prepare statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT student_id, student_pass FROM student WHERE student_username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows === 1) {
+        $stmt->bind_result($student_id, $hashed_pass);
+        $stmt->fetch();
+
+        if (password_verify($password, $hashed_pass)) {
+            $_SESSION['student_id'] = $student_id;
+            header("Location: claim_merit.php");
+            exit();
+        } else {
+            $error = "Invalid password.";
+        }
     } else {
-        $error = "Invalid credentials.";
-        exit();
+        $error = "Username not found.";
     }
-
+    $stmt->close();
 }
-mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
