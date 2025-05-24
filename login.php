@@ -1,57 +1,57 @@
 <?php
 session_start();
-include 'db_connection.php'; // Make sure this file sets up $conn properly
+include('db_connection.php'); // ensure $db is your DB connection
 
-$error = "";
+$errors = [];
 
-// Check if form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check if all required fields are present
-    if (!isset($_POST['username'], $_POST['password'], $_POST['role'])) {
-        $error = "Missing required form fields.";
-    } else {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-        $role = $_POST['role'];
+if (isset($_POST['login_user'])) {
+    $username = mysqli_real_escape_string($db, $_POST['username']);
+    $password = mysqli_real_escape_string($db, $_POST['password']);
+    $role     = mysqli_real_escape_string($db, $_POST['role']);
 
-        // SQL based on role
+    // Validate inputs
+    if (empty($username)) array_push($errors, "Username is required");
+    if (empty($password)) array_push($errors, "Password is required");
+    if (empty($role)) array_push($errors, "Role is required");
+
+    if (count($errors) == 0) {
+
+        // Choose table and column names based on role
         if ($role == 'student') {
-            $sql = "SELECT * FROM student WHERE student_username = ? AND student_pass = ?";
+            $query = "SELECT * FROM student WHERE student_username='$username' AND student_pass='$password'";
         } elseif ($role == 'advisor') {
-            $sql = "SELECT * FROM advisor WHERE advisor_username = ? AND advisor_pass = ?";
+            $query = "SELECT * FROM advisor WHERE advisor_username='$username' AND advisor_pass='$password'";
         } elseif ($role == 'coordinator') {
-            $sql = "SELECT * FROM petakom_coordinator WHERE staff_username = ? AND staff_pass = ?";
+            $query = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' AND staff_pass='$password'";
         } else {
-            $error = "Invalid role selected.";
+            array_push($errors, "Invalid role selected");
         }
 
-        // If no error so far, proceed with DB check
-        if (empty($error)) {
-            $stmt = $conn->prepare($sql);
-            if ($stmt) {
-                $stmt->bind_param("ss", $username, $password);
-                $stmt->execute();
-                $result = $stmt->get_result();
+        // Run query if no errors
+        if (count($errors) == 0) {
+            $results = mysqli_query($db, $query);
+            if (mysqli_num_rows($results) == 1) {
+                $_SESSION['username'] = $username;
+                $_SESSION['role'] = $role;
+                $_SESSION['success'] = "You are now logged in";
 
-                if ($result->num_rows === 1) {
-                    $_SESSION['username'] = $username;
-                    $_SESSION['role'] = $role;
-                    header("Location: studentpage.php"); // Replace
-                    exit();
-                } else {
-                    $error = "Invalid credentials.";
+                // Redirect based on role
+                if ($role == 'student') {
+                    header('location: studentpage.php');
+                } elseif ($role == 'advisor') {
+                    header('location: advisorpage.php');
+                } elseif ($role == 'coordinator') {
+                    header('location: coordinatorpage.php');
                 }
-
-                $stmt->close();
+                exit();
             } else {
-                $error = "SQL error: " . $conn->error;
+                array_push($errors, "Wrong username/password/role combination");
             }
         }
     }
-
-    $conn->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
