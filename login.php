@@ -59,6 +59,7 @@ if (isset($_POST['login'])) {
         $stmt->close();
     }
 }
+if (isset($error)) echo "<p class='error'>$error</p>"; 
 
 mysqli_close($conn);
 ?>
