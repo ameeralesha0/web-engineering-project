@@ -3,7 +3,7 @@ session_start();
 $host = "localhost";
 $username = "root";      // use your DB username
 $password = "";          // use your DB password
-$database = "mypetakom";   // your DB name
+$database = "student";   // your DB name
 
 $conn = new mysqli($host, $username, $password, $database);
 
