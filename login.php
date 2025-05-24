@@ -1,25 +1,17 @@
 <?php
 session_start();
+include 'db_connection.php';
 
-// Show all errors for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Connect using mysqli
-$conn = mysqli_connect("127.0.0.1:3307", "root", "", "student");
-
-// check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+// Check if all required POST data is present
+if (!isset($_POST['email'], $_POST['password'], $_POST['role'])) {
+    die("Missing required form fields.");
 }
 
-if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $role = $_POST['role'];
+$email = $_POST['email'];
+$password = $_POST['password'];
+$role = $_POST['role'];
 
-    // Determine table and column based on role
+// Determine table and column based on role
     if ($role == "student") {
         $query = "SELECT student_id, student_pass FROM student WHERE student_username = ?";
         $redirect = "studentpage.php";
@@ -33,35 +25,31 @@ if (isset($_POST['login'])) {
         $error = "Invalid role selected.";
     }
 
-    if (!isset($error)) {
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows === 1) {
-            $stmt->bind_result($id, $stored_pass);
-            $stmt->fetch();
-
-            // Use plain text check only if passwords are not hashed
-            if ($password === $stored_pass) {
-                $_SESSION['user_id'] = $id;
-                $_SESSION['role'] = $role;
-                header("Location: $redirect");
-                exit();
-            } else {
-                $error = "Invalid password.";
-            }
-        } else {
-            $error = "Username not found.";
-        }
-
-        $stmt->close();
-    }
+// Prepare and execute the SQL query
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("SQL error: " . $conn->error);
 }
-if (isset($error)) echo "<p class='error'>$error</p>"; 
 
-mysqli_close($conn);
+$stmt->bind_param("ss", $email, $password);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Check if user exists
+if ($result->num_rows === 1) {
+    $_SESSION['email'] = $email;
+    $_SESSION['role'] = $role;
+    
+    // Redirect to dashboard (customize this per role if needed)
+    header("Location: studentpage.php");
+    exit();
+} else {
+    // Invalid login
+    echo "<script>alert('Invalid credentials.'); window.location.href='login.php';</script>";
+}
+
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
