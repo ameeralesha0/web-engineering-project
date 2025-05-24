@@ -12,32 +12,55 @@ if (!$conn) {
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $role = $_POST['role'];
 
-    // Prepare statement to prevent SQL injection
-    $stmt = $conn->prepare("SELECT student_id, student_pass FROM student WHERE student_username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows === 1) {
-        $stmt->bind_result($student_id, $hashed_pass);
-        $stmt->fetch();
-
-        if (password_verify($password, $hashed_pass)) {
-            $_SESSION['student_id'] = $student_id;
-            header("Location: claim_merit.php");
-            exit();
-        } else {
-            $error = "Invalid password.";
-        }
+    if ($role === "student") {
+        $query = "SELECT student_id, student_pass FROM student WHERE student_username = ?";
+    } elseif ($role === "advisor") {
+        $query = "SELECT advisor_id, advisor_pass FROM advisor WHERE advisor_username = ?";
+    } elseif ($role === "coordinator") {
+        $query = "SELECT staff_id, staff_pass FROM petakom_coordinator WHERE staff_username = ?";
     } else {
-        $error = "Username not found.";
+        $error = "Invalid role selected.";
     }
-    $stmt->close();
+
+    if (!isset($error)) {
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($id, $hashed_pass);
+            $stmt->fetch();
+
+            // If using hashed passwords, verify with password_verify
+            if (password_verify($password, $hashed_pass)) {
+                $_SESSION['user_id'] = $id;
+                $_SESSION['role'] = $role;
+
+                if ($role === "student") {
+                    header("Location: claim_merit.php");
+                } elseif ($role === "advisor") {
+                    header("Location: advisorpage.php");
+                } else {
+                    header("Location: coordinatorpage.php");
+                }
+                exit();
+            } else {
+                $error = "Invalid password.";
+            }
+        } else {
+            $error = "Username not found.";
+        }
+
+        $stmt->close();
+    }
 }
 
 mysqli_close($conn);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -60,8 +83,9 @@ mysqli_close($conn);
                 <option value="advisor">Event Advisor</option>
                 <option value="coordinator">Petakom Coordinator</option>
             </select>
-            <button type="submit">Login</button>
+            <button type="submit" name="login">Login</button> <!-- Fixed: name="login" added -->
         </form>
+
         <div class="links">
             <a href="register.php">Register</a> | <a href="forgotpassword.php">Forgot Password?</a>
         </div>
