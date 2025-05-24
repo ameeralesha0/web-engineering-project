@@ -24,7 +24,7 @@ if (isset($_POST['login'])) {
         $stmt->bind_result($student_id, $hashed_pass);
         $stmt->fetch();
 
-        if (password_verify($password, $hashed_pass)) {
+        if ($password === $hashed_pass) {
             $_SESSION['student_id'] = $student_id;
             header("Location: studentpage.php");
             exit();
