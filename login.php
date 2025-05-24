@@ -1,58 +1,62 @@
 <?php
 session_start();
-include 'db_connection.php'; // Make sure $conn is properly initialized
+include 'db_connection.php'; // Your database connection file
 
-// Check if all required POST data is present
-if (!isset($_POST['username'], $_POST['password'], $_POST['role'])) {
-    die("Missing required form fields.");
-}
+$error = "";
 
-$username = $_POST['username'];
-$password = $_POST['password'];
-$role = $_POST['role'];
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Check required fields
+    if (!isset($_POST['username'], $_POST['password'], $_POST['role'])) {
+        $error = "Missing required form fields.";
+    } else {
+        $username = trim($_POST['username']);
+        $password = $_POST['password'];
+        $role = $_POST['role'];
 
-// Determine SQL based on role
-if ($role == 'student') {
-    $sql = "SELECT * FROM student WHERE student_username = ? AND student_pass = ?";
-} elseif ($role == 'advisor') {
-    $sql = "SELECT * FROM advisor WHERE advisor_username = ? AND advisor_pass = ?";
-} elseif ($role == 'coordinator') {
-    $sql = "SELECT * FROM petakom_coordinator WHERE staff_username = ? AND staff_pass = ?";
-} else {
-    die("Invalid role selected.");
-}
+        // Validate role and prepare SQL accordingly
+        if ($role == 'student') {
+            $sql = "SELECT * FROM student WHERE student_username = ? AND student_pass = ?";
+        } elseif ($role == 'advisor') {
+            $sql = "SELECT * FROM advisor WHERE advisor_username = ? AND advisor_pass = ?";
+        } elseif ($role == 'coordinator') {
+            $sql = "SELECT * FROM petakom_coordinator WHERE staff_username = ? AND staff_pass = ?";
+        } else {
+            $error = "Invalid role selected.";
+        }
 
-// Prepare and execute the SQL query
-$stmt = $conn->prepare($sql);
-if (!$stmt) {
-    die("SQL error: " . $conn->error);
-}
+        if (empty($error)) {
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("ss", $username, $password);
+                $stmt->execute();
+                $result = $stmt->get_result();
 
-$stmt->bind_param("ss", $username, $password);
-$stmt->execute();
-$result = $stmt->get_result();
+                if ($result->num_rows === 1) {
+                    // Login success: set session variables
+                    $_SESSION['username'] = $username;
+                    $_SESSION['role'] = $role;
 
-// Check if user exists
-if ($result->num_rows === 1) {
-    $_SESSION['username'] = $username;
-    $_SESSION['role'] = $role;
+                    // Redirect based on role
+                    if ($role == 'student') {
+                        header("Location: studentpage.php");
+                    } elseif ($role == 'advisor') {
+                        header("Location: advisorpage.php");
+                    } elseif ($role == 'coordinator') {
+                        header("Location: coordinatorpage.php");
+                    }
+                    exit();
+                } else {
+                    $error = "Invalid username or password.";
+                }
 
-    // Redirect to page based on role (customize as needed)
-    if ($role == 'student') {
-        header("Location: studentpage.php");
-    } elseif ($role == 'advisor') {
-        header("Location: advisorpage.php");
-    } elseif ($role == 'coordinator') {
-        header("Location: coordinatorpage.php");
+                $stmt->close();
+            } else {
+                $error = "Database error: " . htmlspecialchars($conn->error);
+            }
+        }
     }
-    exit();
-} else {
-    // Invalid login
-    echo "<script>alert('Invalid credentials.'); window.location.href='login.php';</script>";
+    $conn->close();
 }
-
-$stmt->close();
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -68,7 +72,7 @@ $conn->close();
         <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
         <h2>Login to MyPetakom</h2>
         <?php if (!empty($error)) echo "<p class='error'>" . htmlspecialchars($error) . "</p>"; ?>
-        <form method="post" novalidate>
+        <form method="post" action="" novalidate>
             <input type="text" name="username" placeholder="Username" required value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
             <input type="password" name="password" placeholder="Password" required>
             <select name="role" required>
