@@ -3,21 +3,21 @@ session_start();
 include 'db_connection.php';
 
 // Check if all required POST data is present
-if (!isset($_POST['email'], $_POST['password'], $_POST['role'])) {
+if (!isset($_POST['username'], $_POST['password'], $_POST['role'])) {
     die("Missing required form fields.");
 }
 
-$email = $_POST['email'];
+$email = $_POST['username'];
 $password = $_POST['password'];
 $role = $_POST['role'];
 
 // Determine SQL based on role
 if ($role == 'student') {
-    $sql = "SELECT * FROM student WHERE student_email = ? AND student_pass = ?";
+    $sql = "SELECT * FROM student WHERE student_username = ? AND student_pass = ?";
 } elseif ($role == 'advisor') {
-    $sql = "SELECT * FROM advisor WHERE advisor_email = ? AND advisor_pass = ?";
+    $sql = "SELECT * FROM advisor WHERE advisor_username = ? AND advisor_pass = ?";
 } elseif ($role == 'coordinator') {
-    $sql = "SELECT * FROM petakom_coordinator WHERE staff_email = ? AND staff_pass = ?";
+    $sql = "SELECT * FROM petakom_coordinator WHERE staff_username = ? AND staff_pass = ?";
 } else {
     die("Invalid role selected.");
 }
@@ -27,7 +27,7 @@ if (!$stmt) {
     die("SQL error: " . $conn->error);
 }
 
-$stmt->bind_param("ss", $email, $password);
+$stmt->bind_param("ss", $username, $password);
 $stmt->execute();
 $result = $stmt->get_result();
 
