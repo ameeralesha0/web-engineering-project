@@ -7,7 +7,7 @@ if (!isset($_POST['username'], $_POST['password'], $_POST['role'])) {
     die("Missing required form fields.");
 }
 
-$email = $_POST['username'];
+$username = $_POST['username'];
 $password = $_POST['password'];
 $role = $_POST['role'];
 
@@ -33,7 +33,7 @@ $result = $stmt->get_result();
 
 // Check if user exists
 if ($result->num_rows === 1) {
-    $_SESSION['email'] = $email;
+    $_SESSION['username'] = $username;
     $_SESSION['role'] = $role;
     
     // Redirect to dashboard (customize this per role if needed)
