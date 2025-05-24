@@ -14,25 +14,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     $role = $_POST['role'];
 
-    // Dummy authentication (replace with DB check)
-    if ($username == 'student' && $password == 'student') {
-        $_SESSION['user'] = $username;
-        $_SESSION['role'] = $role;
-        header('Location: studentpage.php');
-        exit();
-    } elseif ($username == 'advisor' && $password == 'advisor') {
-        $_SESSION['user'] = $username;
-        $_SESSION['role'] = $role;
-        header('Location: advisorpage.php');
-        exit();
-    } elseif ($username == 'coordinator' && $password == 'coordinator') {
-        $_SESSION['user'] = $username;
-        $_SESSION['role'] = $role;
-        header('Location: coordinatorpage.php');
-        exit();
+    // Determine table and column names based on role
+    if ($role === 'student') {
+        $table = 'student';
+        $username_col = 'student_username';
+        $password_col = 'student_pass';
+        $redirect = 'studentpage.php';
+    } elseif ($role === 'advisor') {
+        $table = 'advisor';
+        $username_col = 'advisor_username';
+        $password_col = 'advisor_pass';
+        $redirect = 'advisorpage.php';
+    } elseif ($role === 'coordinator') {
+        $table = 'petakom_coordinator';
+        $username_col = 'staff_username';
+        $password_col = 'staff_pass';
+        $redirect = 'coordinatorpage.php';
     } else {
         $error = "Invalid credentials.";
+        exit();
     }
+
 }
 mysqli_close($conn);
 ?>
