@@ -2,62 +2,59 @@
 session_start();
 include 'db_connection.php'; // Make sure $conn is properly initialized
 
-$error = "";
-
-// Redirect URLs based on role
-$redirect_pages = [
-    'student' => 'studentpage.php',
-    'advisor' => 'advisorpage.php',
-    'coordinator' => 'coordinatorpage.php'
-];
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_POST['username'], $_POST['password'], $_POST['role'])) {
-        $error = "Please fill in all required fields.";
-    } else {
-        $username = trim($_POST['username']);
-        $password = $_POST['password'];
-        $role = $_POST['role'];
-
-        if (!array_key_exists($role, $redirect_pages)) {
-            $error = "Invalid role selected.";
-        } else {
-            // Prepare SQL based on role
-            switch ($role) {
-                case 'student':
-                    $sql = "SELECT * FROM student WHERE student_username = ? AND student_pass = ?";
-                    break;
-                case 'advisor':
-                    $sql = "SELECT * FROM advisor WHERE advisor_username = ? AND advisor_pass = ?";
-                    break;
-                case 'coordinator':
-                    $sql = "SELECT * FROM petakom_coordinator WHERE staff_username = ? AND staff_pass = ?";
-                    break;
-            }
-
-            if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("ss", $username, $password);
-                $stmt->execute();
-                $result = $stmt->get_result();
-
-                if ($result->num_rows === 1) {
-                    $_SESSION['username'] = $username;
-                    $_SESSION['role'] = $role;
-                    header("Location: " . $redirect_pages[$role]);
-                    exit();
-                } else {
-                    $error = "Invalid username or password.";
-                }
-
-                $stmt->close();
-            } else {
-                $error = "Database error: " . htmlspecialchars($conn->error);
-            }
-        }
-    }
-    $conn->close();
+// Check if all required POST data is present
+if (!isset($_POST['username'], $_POST['password'], $_POST['role'])) {
+    die("Missing required form fields.");
 }
+
+$username = $_POST['username'];
+$password = $_POST['password'];
+$role = $_POST['role'];
+
+// Determine SQL based on role
+if ($role == 'student') {
+    $sql = "SELECT * FROM student WHERE student_username = ? AND student_pass = ?";
+} elseif ($role == 'advisor') {
+    $sql = "SELECT * FROM advisor WHERE advisor_username = ? AND advisor_pass = ?";
+} elseif ($role == 'coordinator') {
+    $sql = "SELECT * FROM petakom_coordinator WHERE staff_username = ? AND staff_pass = ?";
+} else {
+    die("Invalid role selected.");
+}
+
+// Prepare and execute the SQL query
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("SQL error: " . $conn->error);
+}
+
+$stmt->bind_param("ss", $username, $password);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Check if user exists
+if ($result->num_rows === 1) {
+    $_SESSION['username'] = $username;
+    $_SESSION['role'] = $role;
+
+    // Redirect to page based on role (customize as needed)
+    if ($role == 'student') {
+        header("Location: studentpage.php");
+    } elseif ($role == 'advisor') {
+        header("Location: advisorpage.php");
+    } elseif ($role == 'coordinator') {
+        header("Location: coordinatorpage.php");
+    }
+    exit();
+} else {
+    // Invalid login
+    echo "<script>alert('Invalid credentials.'); window.location.href='login.php';</script>";
+}
+
+$stmt->close();
+$conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
