@@ -2,59 +2,38 @@
 session_start();
 include 'db_connection.php';
 
-// Check if all required POST data is present
-if (!isset($_POST['email'], $_POST['password'], $_POST['role'])) {
-    die("Missing required form fields.");
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 
-$username = $_POST['username'];
-$password = $_POST['password'];
-$role = $_POST['role'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $role = $_POST['role'];
 
-// Determine table and column based on role
-    if ($role == "student") {
-        $query = "SELECT student_id, student_pass FROM student WHERE student_username = ?";
-        $redirect = "studentpage.php";
-    } elseif ($role == "advisor") {
-        $query = "SELECT advisor_id, advisor_pass FROM advisor WHERE advisor_username = ?";
-        $redirect = "advisorpage.php";
-    } elseif ($role == "coordinator") {
-        $query = "SELECT staff_id, staff_pass FROM petakom_coordinator WHERE staff_username = ?";
-        $redirect = "coordinatorpage.php";
+    // Determine table and column names based on role
+    if ($role === 'student') {
+        $table = 'student';
+        $username_col = 'student_username';
+        $password_col = 'student_pass';
+        $redirect = 'studentpage.php';
+    } elseif ($role === 'advisor') {
+        $table = 'advisor';
+        $username_col = 'advisor_username';
+        $password_col = 'advisor_pass';
+        $redirect = 'advisorpage.php';
+    } elseif ($role === 'coordinator') {
+        $table = 'petakom_coordinator';
+        $username_col = 'staff_username';
+        $password_col = 'staff_pass';
+        $redirect = 'coordinatorpage.php';
     } else {
-        $error = "Invalid role selected.";
-    }
-
-// Prepare and execute the SQL query
-$stmt = $conn->prepare($query);
-if (!$stmt) {
-    die("SQL error: " . $conn->error);
-}
-
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-
-// Check if user exists and password matches
-if ($result->num_rows === 1) {
-    $row = $result->fetch_assoc();
-    $stored_pass = $row[array_keys($row)[1]];
-
-    // Check plain text password (replace with password_verify if using hashes)
-    if ($password === $stored_pass) {
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-        header("Location: $redirect");
+        $error = "Invalid credentials.";
         exit();
-    } else {
-        echo "<script>alert('Invalid password.'); window.location.href='login.php';</script>";
     }
-} else {
-    echo "<script>alert('Username not found.'); window.location.href='login.php';</script>";
 }
-
-$stmt->close();
-$conn->close();
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
