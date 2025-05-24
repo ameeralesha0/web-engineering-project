@@ -63,8 +63,6 @@ if (isset($_POST['login'])) {
 mysqli_close($conn);
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,15 +77,15 @@ mysqli_close($conn);
         <h2>Login to MyPetakom</h2>
         <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
         <form method="post">
-            <input type="text" name="username" placeholder="Username" required>
+            <input type="text" name="username" placeholder="Username" required value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
             <input type="password" name="password" placeholder="Password" required>
             <select name="role" required>
-                <option value="student">Student</option>
-                <option value="advisor">Event Advisor</option>
-                <option value="coordinator">Petakom Coordinator</option>
+                <option value="student" <?php if (isset($_POST['role']) && $_POST['role'] == 'student') echo 'selected'; ?>>Student</option>
+                <option value="advisor" <?php if (isset($_POST['role']) && $_POST['role'] == 'advisor') echo 'selected'; ?>>Event Advisor</option>
+                <option value="coordinator" <?php if (isset($_POST['role']) && $_POST['role'] == 'coordinator') echo 'selected'; ?>>Petakom Coordinator</option>
             </select>
             <button type="submit" name="login">Login</button>
-            </form>
+        </form>
         <div class="links">
             <a href="register.php">Register</a> | <a href="forgotpassword.php">Forgot Password?</a>
         </div>
