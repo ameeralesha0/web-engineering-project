@@ -7,7 +7,7 @@ if (!isset($_POST['email'], $_POST['password'], $_POST['role'])) {
     die("Missing required form fields.");
 }
 
-$email = $_POST['email'];
+$username = $_POST['username'];
 $password = $_POST['password'];
 $role = $_POST['role'];
 
@@ -31,21 +31,26 @@ if (!$stmt) {
     die("SQL error: " . $conn->error);
 }
 
-$stmt->bind_param("s", $email); 
+$stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Check if user exists
+// Check if user exists and password matches
 if ($result->num_rows === 1) {
-    $_SESSION['email'] = $email;
-    $_SESSION['role'] = $role;
-    
-    // Redirect to dashboard (customize this per role if needed)
-    header("Location: studentpage.php");
-    exit();
+    $row = $result->fetch_assoc();
+    $stored_pass = $row[array_keys($row)[1]];
+
+    // Check plain text password (replace with password_verify if using hashes)
+    if ($password === $stored_pass) {
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = $role;
+        header("Location: $redirect");
+        exit();
+    } else {
+        echo "<script>alert('Invalid password.'); window.location.href='login.php';</script>";
+    }
 } else {
-    // Invalid login
-    echo "<script>alert('Invalid credentials.'); window.location.href='login.php';</script>";
+    echo "<script>alert('Username not found.'); window.location.href='login.php';</script>";
 }
 
 $stmt->close();
