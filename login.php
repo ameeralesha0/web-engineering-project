@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($result->num_rows === 1) {
                     $_SESSION['username'] = $username;
                     $_SESSION['role'] = $role;
-                    header("Location: studentdashboard.php"); // Replace with actual dashboard
+                    header("Location: studentpage.php"); // Replace
                     exit();
                 } else {
                     $error = "Invalid credentials.";
