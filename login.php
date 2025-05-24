@@ -26,12 +26,12 @@ $role = $_POST['role'];
     }
 
 // Prepare and execute the SQL query
-$stmt = $conn->prepare($sql);
+$stmt = $conn->prepare($query);
 if (!$stmt) {
     die("SQL error: " . $conn->error);
 }
 
-$stmt->bind_param("ss", $email, $password);
+$stmt->bind_param("s", $email); 
 $stmt->execute();
 $result = $stmt->get_result();
 
