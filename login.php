@@ -1,6 +1,14 @@
 <?php
 session_start();
 
+// Connect using mysqli
+$conn = mysqli_connect("localhost", "root", "", "your_database_name");
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -26,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Invalid credentials.";
     }
 }
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
