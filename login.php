@@ -2,7 +2,7 @@
 session_start();
 
 // Connect using mysqli
-$conn = mysqli_connect("localhost", "root", "", "your_database_name");
+$conn = mysqli_connect("localhost", "root", "", "student");
 
 // Check connection
 if (!$conn) {
