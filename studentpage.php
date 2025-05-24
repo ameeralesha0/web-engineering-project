@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'db_connection.php'; // Make sure this file sets up $conn properly
 
 // Redirect if not logged in
 if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'student') {
