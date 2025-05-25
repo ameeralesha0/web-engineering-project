@@ -69,7 +69,7 @@ if (isset($_POST['login_user'])) {
 
   if (count($errors) == 0) {
   	$password = md5($password);
-  	$query = "SELECT * FROM student WHERE student_username='$username' AND student_password='$password'";
+  	$query = "SELECT * FROM student WHERE student_username='$username' AND student_pass='$password'";
   	$results = mysqli_query($db, $query);
   	if (mysqli_num_rows($results) == 1) {
   	  $_SESSION['username'] = $username;
