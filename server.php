@@ -28,19 +28,40 @@ if (isset($_POST['reg_user'])) {
 
   // first check the database to make sure 
   // a user does not already exist with the same username and/or email
-  $user_check_query = "SELECT * FROM users WHERE username='$username' OR email='$email' LIMIT 1";
-  $result = mysqli_query($db, $user_check_query);
-  $user = mysqli_fetch_assoc($result);
-  
-  if ($user) { // if user exists
-    if ($user['username'] === $username) {
-      array_push($errors, "Username already exists");
-    }
+  if ($role === 'student') {
+    $check_query = "SELECT * FROM student WHERE student_username='$username' OR student_email='$email' LIMIT 1";
+} elseif ($role === 'advisor') {
+    $check_query = "SELECT * FROM advisor WHERE advisor_username='$username' OR advisor_email='$email' LIMIT 1";
+} elseif ($role === 'coordinator') {
+    $check_query = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' OR staff_email='$email' LIMIT 1";
+} else {
+    array_push($errors, "Invalid user role selected");
+}
 
-    if ($user['email'] === $email) {
-      array_push($errors, "email already exists");
+if (!empty($check_query)) {
+    $result = mysqli_query($db, $check_query);
+    $user = mysqli_fetch_assoc($result);
+
+    if ($user) {
+        // Check based on role-specific fields
+        if (
+            ($role === 'student' && $user['student_username'] === $username) ||
+            ($role === 'advisor' && $user['advisor_username'] === $username) ||
+            ($role === 'coordinator' && $user['staff_username'] === $username)
+        ) {
+            array_push($errors, "Username already exists");
+        }
+
+        if (
+            ($role === 'student' && $user['student_email'] === $email) ||
+            ($role === 'advisor' && $user['advisor_email'] === $email) ||
+            ($role === 'coordinator' && $user['staff_email'] === $email)
+        ) {
+            array_push($errors, "Email already exists");
+        }
     }
-  }
+}
+
 
   // Finally, register user if there are no errors in the form
   if (count($errors) == 0) {
