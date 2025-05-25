@@ -1,6 +1,9 @@
 <?php
-error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+echo "<pre>"; print_r($_POST); echo "</pre>";
+
 session_start();
 include('db_connection.php');
 
@@ -47,7 +50,7 @@ if (isset($_POST['login'])) {
                 echo "Fetched user: ID = $user_id, Hashed Pass = $hashed_pass<br>";
                 echo "Password entered: " . $password . "<br>";
 
-                if (password_verify($password, $hashed_pass)) {
+                if ($password === $hashed_pass){
                     $_SESSION['user_id'] = $user_id;
                     $_SESSION['role'] = $role;
 
