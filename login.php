@@ -5,11 +5,19 @@ include('db_connection.php');
 // Initialize error message
 $error = '';
 
+// Initialize form data variables
+$username_value = '';
+$selected_role = '';
+
 if (isset($_POST['login'])) {
     // Sanitize and validate input
     $username = trim($_POST['username']);
     $password = $_POST['password'];
     $role = $_POST['role'];
+
+    // Store form values for repopulation
+    $username_value = htmlspecialchars($username);
+    $selected_role = htmlspecialchars($role);
 
     // Validate role selection
     if (empty($role)) {
@@ -93,13 +101,13 @@ if (isset($_POST['login'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - MyPetakom</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="login-container">
@@ -113,13 +121,13 @@ if (isset($_POST['login'])) {
 
         <form method="post" action="">
             <input type="text" name="username" placeholder="Username" required
-                   value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+                   value="<?php echo $username_value; ?>">
             <input type="password" name="password" placeholder="Password" required>
             <select name="role" required>
                 <option value="">-- Select Role --</option>
-                <option value="student" <?php if (isset($_POST['role']) && $_POST['role'] == 'student') echo 'selected'; ?>>Student</option>
-                <option value="advisor" <?php if (isset($_POST['role']) && $_POST['role'] == 'advisor') echo 'selected'; ?>>Event Advisor</option>
-                <option value="coordinator" <?php if (isset($_POST['role']) && $_POST['role'] == 'coordinator') echo 'selected'; ?>>Petakom Coordinator</option>
+                <option value="student" <?php echo ($selected_role == 'student') ? 'selected' : ''; ?>>Student</option>
+                <option value="advisor" <?php echo ($selected_role == 'advisor') ? 'selected' : ''; ?>>Event Advisor</option>
+                <option value="coordinator" <?php echo ($selected_role == 'coordinator') ? 'selected' : ''; ?>>Petakom Coordinator</option>
             </select>
             <button type="submit" name="login">Login</button>
         </form>
