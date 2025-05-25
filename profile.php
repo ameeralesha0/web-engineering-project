@@ -10,6 +10,9 @@
   	unset($_SESSION['username']);
   	header("location: login.php");
   }
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
+$user = $_SESSION['username'] ?? '';
+$email = $_SESSION['email'] ?? '';
 ?>
 
 <!DOCTYPE html>
