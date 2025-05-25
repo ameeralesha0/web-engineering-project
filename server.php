@@ -83,7 +83,7 @@ $password = mysqli_real_escape_string($db, $_POST['password']);
 $role = mysqli_real_escape_string($db, $_POST['role']);
 
 if (count($errors) == 0) {
-    $password = md5($password_1); // use password_hash() in future
+    $password = md5($password); // use password_hash() in future
 
     if ($role === 'student') {
         $query = "INSERT INTO student (student_username, student_email, student_pass) 
