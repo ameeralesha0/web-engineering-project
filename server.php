@@ -86,7 +86,7 @@ if (isset($_POST['login_user'])) {
         $_SESSION['username'] = $username;
         $_SESSION['role'] = 'student';
         $_SESSION['success'] = "You are now logged in as Student";
-        header('location: index.php');
+        header('location: studentpage.php');
 
     } elseif (mysqli_num_rows($result_advisor) == 1) {
         $_SESSION['username'] = $username;
