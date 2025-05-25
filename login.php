@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 include('db_connection.php');
 
@@ -16,7 +18,7 @@ if (isset($_POST['login'])) {
         $role_table_map = [
             'student' => ['table' => 'student', 'id_field' => 'student_id', 'username_field' => 'student_username', 'pass_field' => 'student_pass'],
             'advisor' => ['table' => 'advisor', 'id_field' => 'advisor_id', 'username_field' => 'advisor_username', 'pass_field' => 'advisor_pass'],
-            'coordinator' => ['table' => 'coordinator', 'id_field' => 'coordinator_id', 'username_field' => 'coordinator_username', 'pass_field' => 'coordinator_pass'],
+            'coordinator' => ['table' => 'petakom_coordinator', 'id_field' => 'staff_id', 'username_field' => 'staff_username', 'pass_field' => 'staff_pass'],
         ];
 
         if (!isset($role_table_map[$role])) {
@@ -42,6 +44,8 @@ if (isset($_POST['login'])) {
             if ($stmt->num_rows === 1) {
                 $stmt->bind_result($user_id, $hashed_pass);
                 $stmt->fetch();
+                echo "Fetched user: ID = $user_id, Hashed Pass = $hashed_pass<br>";
+                echo "Password entered: " . $password . "<br>";
 
                 if (password_verify($password, $hashed_pass)) {
                     $_SESSION['user_id'] = $user_id;
