@@ -17,9 +17,9 @@
 		<input type="password" name="password" placeholder="Password" required>
         <select name="role" required>
 			<option value="">-- Select Role --</option>
-			<option value="student" <?php echo ($selected_role == 'student') ? 'selected' : ''; ?>>Student</option>
-            <option value="advisor" <?php echo ($selected_role == 'advisor') ? 'selected' : ''; ?>>Event Advisor</option>
-            <option value="coordinator" <?php echo ($selected_role == 'coordinator') ? 'selected' : ''; ?>>Petakom Coordinator</option>
+			<option value="student">Student</option>
+            <option value="advisor">Event Advisor</option>
+            <option value="coordinator">Petakom Coordinator</option>
         </select>
   		<button type="submit" class="btn" name="login_user">Login</button>
   		<div class="links">
