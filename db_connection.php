@@ -1,13 +1,16 @@
 <?php
 $host = "localhost";
-$username = "root"; // update if different
-$password = ""; // update if different
+$username = "root"; 
+$password = "";
 $database = "mypetakom";
 
-$conn = new mysqli($host, $username, $password, $database , 3307);
+// Report MySQLi errors for debugging (disable in production)
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+$conn = mysqli_connect($host, $username, $password, $database);
 
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 ?>
