@@ -1,28 +1,17 @@
-<?php
-session_start();
-if (!isset($_SESSION['user'])) {
-    header('Location: login.php');
-    exit();
-}
+<?php 
+  session_start(); 
 
-$user = $_SESSION['user'];
-$role = $_SESSION['role'] ?? 'student';
-
-// Dummy user info (replace with actual DB values or database query)
-$email = "user@example.com";
-$username = $user;
-
-// Determine dashboard based on role
-$dashboard = 'studentpage.php';
-switch ($role) {
-    case 'coordinator':
-        $dashboard = 'coordinatorpage.php';
-        break;
-    case 'advisor':
-        $dashboard = 'advisorpage.php';
-        break;
-}
+  if (!isset($_SESSION['username'])) {
+  	$_SESSION['msg'] = "You must log in first";
+  	header('location: login.php');
+  }
+  if (isset($_GET['logout'])) {
+  	session_destroy();
+  	unset($_SESSION['username']);
+  	header("location: login.php");
+  }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
