@@ -1,26 +1,15 @@
-<?php
-session_start();
+<?php 
+  session_start(); 
 
-if (!isset($_SESSION['user'])) {
-    header("Location: login.php");
-    exit();
-}
-
-$user = $_SESSION['user'];
-$email = $_SESSION['email'] ?? 'Not set';
-$role = $_SESSION['role'] ?? 'Unknown';
-
-// Determine dashboard based on role
-switch ($_SESSION['role']) {
-    case 'coordinator':
-        $previous = 'coordinatorpage.php';
-        break;
-    case 'advisor':
-        $previous = 'advisorpage.php';
-        break;
-    default:
-        $previous = 'studentpage.php';
-}
+  if (!isset($_SESSION['username'])) {
+  	$_SESSION['msg'] = "You must log in first";
+  	header('location: login.php');
+  }
+  if (isset($_GET['logout'])) {
+  	session_destroy();
+  	unset($_SESSION['username']);
+  	header("location: login.php");
+  }
 ?>
 
 <!DOCTYPE html>
