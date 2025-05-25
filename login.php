@@ -2,54 +2,33 @@
 session_start();
 include('db_connection.php'); // ensure $db is your DB connection
 
-$errors = [];
+if (isset($_POST['login'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-if (isset($_POST['login_user'])) {
-    $username = mysqli_real_escape_string($db, $_POST['username']);
-    $password = mysqli_real_escape_string($db, $_POST['password']);
-    $role     = mysqli_real_escape_string($db, $_POST['role']);
+    // Prepare statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT student_id, student_pass FROM student WHERE student_username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
 
-    // Validate inputs
-    if (empty($username)) array_push($errors, "Username is required");
-    if (empty($password)) array_push($errors, "Password is required");
-    if (empty($role)) array_push($errors, "Role is required");
+    if ($stmt->num_rows === 1) {
+        $stmt->bind_result($student_id, $hashed_pass);
+        $stmt->fetch();
 
-    if (count($errors) == 0) {
-
-        // Choose table and column names based on role
-        if ($role == 'student') {
-            $query = "SELECT * FROM student WHERE student_username='$username' AND student_pass='$password'";
-        } elseif ($role == 'advisor') {
-            $query = "SELECT * FROM advisor WHERE advisor_username='$username' AND advisor_pass='$password'";
-        } elseif ($role == 'coordinator') {
-            $query = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' AND staff_pass='$password'";
+        if (password_verify($password, $hashed_pass)) {
+            $_SESSION['student_id'] = $student_id;
+            header("Location: studentpage.php");
+            exit();
         } else {
-            array_push($errors, "Invalid role selected");
+            $error = "Invalid password.";
         }
-
-        // Run query if no errors
-        if (count($errors) == 0) {
-            $results = mysqli_query($db, $query);
-            if (mysqli_num_rows($results) == 1) {
-                $_SESSION['username'] = $username;
-                $_SESSION['role'] = $role;
-                $_SESSION['success'] = "You are now logged in";
-
-                // Redirect based on role
-                if ($role == 'student') {
-                    header('location: studentpage.php');
-                } elseif ($role == 'advisor') {
-                    header('location: advisorpage.php');
-                } elseif ($role == 'coordinator') {
-                    header('location: coordinatorpage.php');
-                }
-                exit();
-            } else {
-                array_push($errors, "Wrong username/password/role combination");
-            }
-        }
+    } else {
+        $error = "Username not found.";
     }
+    $stmt->close();
 }
+
 ?>
 
 <!DOCTYPE html>
