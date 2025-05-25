@@ -1,6 +1,16 @@
 <?php
 session_start();
-include 'db_connection.php'; // Make sure this file sets up $conn properly
+$host = "127.0.0.1:3307";
+$username = "root";      // use your DB username
+$password = "";          // use your DB password
+$database = "mypetakom";   // your DB name
+
+$conn = new mysqli($host, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Redirect if not logged in
 if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'student') {
