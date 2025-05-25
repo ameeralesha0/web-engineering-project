@@ -2,30 +2,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Registration system PHP and MySQL</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+    <title>Login - MyPetakom</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="header">
-  	<h2>Login</h2>
-  </div>
-	 
-  <form method="post" action="login.php">
-  	<?php include('errors.php'); ?>
-  	<div class="input-group">
-  		<label>Username</label>
-  		<input type="text" name="username" >
-  	</div>
-  	<div class="input-group">
-  		<label>Password</label>
-  		<input type="password" name="password">
-  	</div>
-  	<div class="input-group">
+  <div class="login-container">
+    <div class="form-side">
+        <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
+        <h2>Login to MyPetakom</h2>
+  		<form method="post" action="login.php">
+  		<?php include('errors.php'); ?>
+		<input type="text" name="username" placeholder="Username" required>
+		<input type="password" name="password" placeholder="Password" required>
+        <select name="role" required>
+			<option value="">-- Select Role --</option>
+			<option value="student" <?php echo ($selected_role == 'student') ? 'selected' : ''; ?>>Student</option>
+            <option value="advisor" <?php echo ($selected_role == 'advisor') ? 'selected' : ''; ?>>Event Advisor</option>
+            <option value="coordinator" <?php echo ($selected_role == 'coordinator') ? 'selected' : ''; ?>>Petakom Coordinator</option>
+        </select>
   		<button type="submit" class="btn" name="login_user">Login</button>
-  	</div>
-  	<p>
-  		Not yet a member? <a href="register.php">Sign up</a>
-  	</p>
-  </form>
+  		<div class="links">
+            <a href="register.php">Register</a> | <a href="forgotpassword.php">Forgot Password?</a>
+        </div>
+  		</form>
+	</div>
+	<div class="title-side">
+        <h1>WELCOME</h1>
+        <h2>to MyPetakom</h2>
+    </div>
+</div>
 </body>
 </html>
+
