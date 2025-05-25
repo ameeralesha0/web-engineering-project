@@ -73,11 +73,11 @@ if (isset($_POST['login'])) {
 
         // Redirect to dashboard based on role
         if ($role == "student") {
-            header("Location: student_dashboard.php");
+            header("Location: studentpage.php");
         } elseif ($role == "advisor") {
-            header("Location: advisor_dashboard.php");
+            header("Location: advisorpage.php");
         } elseif ($role == "coordinator") {
-            header("Location: coordinator_dashboard.php");
+            header("Location: coordinatorpage.php");
         }
         exit();
     } else {
