@@ -12,31 +12,34 @@ $db = mysqli_connect('127.0.0.1:3307', 'root', '', 'mypetakom');
 // REGISTER USER
 if (isset($_POST['reg_user'])) {
   // receive all input values from the form
+  $name = mysqli_real_escape_string($db, $_POST['name']);
   $username = mysqli_real_escape_string($db, $_POST['username']);
   $email = mysqli_real_escape_string($db, $_POST['email']);
-  $password_1 = mysqli_real_escape_string($db, $_POST['password_1']);
-  $password_2 = mysqli_real_escape_string($db, $_POST['password_2']);
+  $password = mysqli_real_escape_string($db, $_POST['password']);
+  $id = mysqli_real_escape_string($db, $_POST['id']);
 
   // form validation: ensure that the form is correctly filled ...
   // by adding (array_push()) corresponding error unto $errors array
+  if (empty($name)) { array_push($errors, "Name is required"); }
   if (empty($username)) { array_push($errors, "Username is required"); }
   if (empty($email)) { array_push($errors, "Email is required"); }
-  if (empty($password_1)) { array_push($errors, "Password is required"); }
-  if ($password_1 != $password_2) {
-	array_push($errors, "The two passwords do not match");
-  }
+  if (empty($password)) { array_push($errors, "Password is required"); }
+  if (empty($id)) { array_push($errors, "ID is required"); }
 
   // first check the database to make sure 
   // a user does not already exist with the same username and/or email
+$name = mysqli_real_escape_string($db, $_POST['name']);
 $username = mysqli_real_escape_string($db, $_POST['username']);
 $email = mysqli_real_escape_string($db, $_POST['email']);
 $role = mysqli_real_escape_string($db, $_POST['role']);
+$id = mysqli_real_escape_string($db, $_POST['id']);
+
   if ($role === 'student') {
-    $check_query = "SELECT * FROM student WHERE student_username='$username' OR student_email='$email' LIMIT 1";
+    $check_query = "SELECT * FROM student WHERE student_username='$username' OR student_email='$email' OR student_id = '$id'  LIMIT 1";
 } elseif ($role === 'advisor') {
-    $check_query = "SELECT * FROM advisor WHERE advisor_username='$username' OR advisor_email='$email' LIMIT 1";
+    $check_query = "SELECT * FROM advisor WHERE advisor_username='$username' OR advisor_email='$email' OR advisor_id = '$id' LIMIT 1";
 } elseif ($role === 'coordinator') {
-    $check_query = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' OR staff_email='$email' LIMIT 1";
+    $check_query = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' OR staff_email='$email' OR staff_id = '$id' LIMIT 1";
 } else {
     array_push($errors, "Invalid user role selected");
 }
@@ -62,13 +65,21 @@ if (!empty($check_query)) {
         ) {
             array_push($errors, "Email already exists");
         }
+
+        if (
+            ($role === 'student' && $user['student_id'] === $id) ||
+            ($role === 'advisor' && $user['advisor_id'] === $id) ||
+            ($role === 'coordinator' && $user['staff_id'] === $id)
+        ) {
+            array_push($errors, "ID already exists");
+        }
     }
 }
 
   // Finally, register user if there are no errors in the form
-  $username = mysqli_real_escape_string($db, $_POST['username']);
+$username = mysqli_real_escape_string($db, $_POST['username']);
 $email = mysqli_real_escape_string($db, $_POST['email']);
-$password_1 = mysqli_real_escape_string($db, $_POST['password_1']);
+$password = mysqli_real_escape_string($db, $_POST['password']);
 $role = mysqli_real_escape_string($db, $_POST['role']);
 
 if (count($errors) == 0) {
