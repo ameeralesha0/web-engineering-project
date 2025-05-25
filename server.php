@@ -28,6 +28,9 @@ if (isset($_POST['reg_user'])) {
 
   // first check the database to make sure 
   // a user does not already exist with the same username and/or email
+$username = mysqli_real_escape_string($db, $_POST['username']);
+$email = mysqli_real_escape_string($db, $_POST['email']);
+$role = mysqli_real_escape_string($db, $_POST['role']);
   if ($role === 'student') {
     $check_query = "SELECT * FROM student WHERE student_username='$username' OR student_email='$email' LIMIT 1";
 } elseif ($role === 'advisor') {
@@ -61,7 +64,6 @@ if (!empty($check_query)) {
         }
     }
 }
-
 
   // Finally, register user if there are no errors in the form
   if (count($errors) == 0) {
