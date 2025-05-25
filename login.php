@@ -1,134 +1,67 @@
 <?php
 session_start();
+$host = "127.0.0.1:3307";
+$username = "root";      // use your DB username
+$password = "";          // use your DB password
+$database = "mypetakom";   // your DB name
 
-// Database connection
-$conn = mysqli_connect('127.0.0.1:3307', 'root', '', 'mypetakom');
+$conn = new mysqli($host, $username, $password, $database);
 
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Initialize variables
-$error = '';
-$username_value = '';
-$selected_role = '';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = trim($_POST['username']);
+if (isset($_POST['login'])) {
+    $username = $_POST['username'];
     $password = $_POST['password'];
-    $role = $_POST['role'];
-    
-    // Store form values for repopulation
-    $username_value = htmlspecialchars($username);
-    $selected_role = htmlspecialchars($role);
 
-    // Validate inputs
-    if (empty($username) || empty($password) || empty($role)) {
-        $error = "All fields are required.";
+    // Prepare statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT student_id, student_pass FROM student WHERE student_username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows === 1) {
+        $stmt->bind_result($student_id, $hashed_pass);
+        $stmt->fetch();
+
+        if (password_verify($password, $hashed_pass)) {
+            $_SESSION['student_id'] = $student_id;
+            header("Location: studentpage.php");
+            exit();
+        } else {
+            $error = "Invalid password.";
+        }
     } else {
-        // Determine table and field names based on role
-        switch ($role) {
-            case 'student':
-                $table = 'student';
-                $id_field = 'student_id';
-                $username_field = 'student_username';
-                $pass_field = 'student_pass';
-                $redirect = 'studentpage.php';
-                break;
-            case 'advisor':
-                $table = 'advisor';
-                $id_field = 'advisor_id';
-                $username_field = 'advisor_username';
-                $pass_field = 'advisor_pass';
-                $redirect = 'advisorpage.php';
-                break;
-            case 'coordinator':
-                $table = 'petakom_coordinator';
-                $id_field = 'staff_id';
-                $username_field = 'staff_username';
-                $pass_field = 'staff_pass';
-                $redirect = 'coordinatorpage.php';
-                break;
-            default:
-                $error = "Invalid role selected.";
-                break;
-        }
-
-        if (empty($error)) {
-            // Prepare SQL statement to prevent SQL injection
-            $query = "SELECT $id_field, $pass_field FROM $table WHERE $username_field = ?";
-            $stmt = mysqli_prepare($conn, $query);
-            
-            if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "s", $username);
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-                
-                if (mysqli_num_rows($result) == 1) {
-                    $user = mysqli_fetch_assoc($result);
-                    
-                    // Verify password (assuming passwords are hashed with password_hash())
-                    if (password_verify($password, $user[$pass_field])) {
-                        $_SESSION['user_id'] = $user[$id_field];
-                        $_SESSION['username'] = $username;
-                        $_SESSION['role'] = $role;
-                        
-                        // Regenerate session ID for security
-                        session_regenerate_id(true);
-                        
-                        // Redirect to appropriate page
-                        header("Location: $redirect");
-                        exit();
-                    } else {
-                        $error = "Invalid username or password.";
-                    }
-                } else {
-                    $error = "Invalid username or password.";
-                }
-                
-                mysqli_stmt_close($stmt);
-            } else {
-                $error = "Database error. Please try again later.";
-            }
-        }
+        $error = "Username not found.";
     }
+    $stmt->close();
 }
-mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Login - MyPetakom</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Login</title>
+    <style>
+        body { font-family: Arial; margin: 50px auto; width: 300px; }
+        label, input { display: block; margin: 10px 0; }
+        input[type=submit] { margin-top: 20px; }
+        .error { color: red; }
+    </style>
 </head>
 <body>
-<div class="login-container">
-    <div class="form-side">
-        <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
-        <h2>Login to MyPetakom</h2>
-        <?php if (!empty($error)) echo "<p class='error'>$error</p>"; ?>
-        <form method="post">
-            <input type="text" name="username" placeholder="Username" required 
-                   value="<?php echo $username_value; ?>">
-            <input type="password" name="password" placeholder="Password" required>
-            <select name="role" required>
-                <option value="">-- Select Role --</option>
-                <option value="student" <?php echo ($selected_role == 'student') ? 'selected' : ''; ?>>Student</option>
-                <option value="advisor" <?php echo ($selected_role == 'advisor') ? 'selected' : ''; ?>>Event Advisor</option>
-                <option value="coordinator" <?php echo ($selected_role == 'coordinator') ? 'selected' : ''; ?>>Petakom Coordinator</option>
-            </select>
-            <button type="submit">Login</button>
-        </form>
-        <div class="links">
-            <a href="register.php">Register</a> | <a href="forgotpassword.php">Forgot Password?</a>
-        </div>
-    </div>
-    <div class="title-side">
-        <h1>WELCOME</h1>
-        <h2>to MyPetakom</h2>
-    </div>
-</div>
+    <h2>Student Login</h2>
+    <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+    <form method="post">
+        <label>Username</label>
+        <input type="text" name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <input type="submit" name="login" value="Login">
+    </form>
 </body>
 </html>
