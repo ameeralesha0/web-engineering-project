@@ -68,17 +68,43 @@ if (isset($_POST['login_user'])) {
   }
 
   if (count($errors) == 0) {
-  	$password = md5($password);
-  	$query = "SELECT * FROM student WHERE student_username='$username' AND student_pass='$password'";
-  	$results = mysqli_query($db, $query);
-  	if (mysqli_num_rows($results) == 1) {
-  	  $_SESSION['username'] = $username;
-  	  $_SESSION['success'] = "You are now logged in";
-  	  header('location: index.php');
-  	}else {
-  		array_push($errors, "Wrong username/password combination");
-  	}
-  }
+    $password = md5($password); // consider upgrading to password_hash() in future
+
+    // Check student table
+    $query_student = "SELECT * FROM student WHERE student_username='$username' AND student_pass='$password'";
+    $result_student = mysqli_query($db, $query_student);
+
+    // Check advisor table
+    $query_advisor = "SELECT * FROM advisor WHERE advisor_username='$username' AND advisor_pass='$password'";
+    $result_advisor = mysqli_query($db, $query_advisor);
+
+    // Check coordinator table
+    $query_coordinator = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' AND staff_pass='$password'";
+    $result_coordinator = mysqli_query($db, $query_coordinator);
+
+    if (mysqli_num_rows($result_student) == 1) {
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = 'student';
+        $_SESSION['success'] = "You are now logged in as Student";
+        header('location: student/index.php');
+
+    } elseif (mysqli_num_rows($result_advisor) == 1) {
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = 'advisor';
+        $_SESSION['success'] = "You are now logged in as Advisor";
+        header('location: advisor/index.php');
+
+    } elseif (mysqli_num_rows($result_coordinator) == 1) {
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = 'coordinator';
+        $_SESSION['success'] = "You are now logged in as Coordinator";
+        header('location: coordinator/index.php');
+
+    } else {
+        array_push($errors, "Wrong username/password combination");
+    }
+}
+
 }
 
 ?>
