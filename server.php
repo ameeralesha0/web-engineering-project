@@ -7,7 +7,7 @@ $email    = "";
 $errors = array(); 
 
 // connect to the database
-$db = mysqli_connect('127.0.0.1:3307', 'root', '', 'project');
+$db = mysqli_connect('127.0.0.1:3307', 'root', '', 'mypetakom');
 
 // REGISTER USER
 if (isset($_POST['reg_user'])) {
