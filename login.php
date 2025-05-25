@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Connect using mysqli
-$conn = mysqli_connect("localhost", "root", "", "student");
+$conn = mysqli_connect('127.0.0.1:3307', 'root', '', 'mypetakom');
 
 // Check connection
 if (!$conn) {
