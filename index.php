@@ -1,43 +1,7 @@
 <?php 
 session_start();
 $conn = mysqli_connect('127.0.0.1:3307', 'root', '', 'mypetakom') or die ('Unable to connect');
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - MyPetakom</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="login-container">
-    <div class="form-side">
-        <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
-        <h2>Login to MyPetakom</h2>
-        <form method="post" action="">
-            <input type="text" name="username" placeholder="Username" required></br> 
-            <input type="password" name="password" placeholder="Password" required></br>
-            <select name="role" required>
-                <option value="">-- Select Role --</option>
-                <option value="student">Student</option>
-                <option value="advisor">Event Advisor</option>
-                <option value="coordinator">Petakom Coordinator</option>
-            </select>
-            <button type="submit" name="login">Login</button>
-        </form>
-
-        <div class="links">
-            <a href="register.php">Register</a> | <a href="forgotpassword.php">Forgot Password?</a>
-        </div>
-    </div>
-    <div class="title-side">
-        <h1>WELCOME</h1>
-        <h2>to MyPetakom</h2>
-    </div>
-</div>
-
-<?php
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -85,5 +49,39 @@ if (isset($_POST['login'])) {
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - MyPetakom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="login-container">
+    <div class="form-side">
+        <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
+        <h2>Login to MyPetakom</h2>
+        <form method="post" action="">
+            <input type="text" name="username" placeholder="Username" required></br> 
+            <input type="password" name="password" placeholder="Password" required></br>
+            <select name="role" required>
+                <option value="">-- Select Role --</option>
+                <option value="student">Student</option>
+                <option value="advisor">Event Advisor</option>
+                <option value="coordinator">Petakom Coordinator</option>
+            </select>
+            <button type="submit" name="login">Login</button>
+        </form>
+
+        <div class="links">
+            <a href="register.php">Register</a> | <a href="forgotpassword.php">Forgot Password?</a>
+        </div>
+    </div>
+    <div class="title-side">
+        <h1>WELCOME</h1>
+        <h2>to MyPetakom</h2>
+    </div>
+</div>
 </body>
 </html>
