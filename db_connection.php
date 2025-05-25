@@ -1,16 +1,18 @@
 <?php
-$host = "127.0.0.1:3307";
-$username = "root"; 
+// Database Configuration
+$servername = "127.0.0.1:3307";
+$username = "root";
 $password = "";
-$database = "mypetakom";
+$dbname = "mypetakom";
 
-// Report MySQLi errors for debugging (disable in production)
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$conn = mysqli_connect($host, $username, $password, $database);
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
 }
+
+//success message for testing
+echo "Database Connected Successfully!";
 ?>
