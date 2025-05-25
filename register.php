@@ -14,16 +14,17 @@
         <h2>Register a New Account</h2>
   	<form method="post" action="register.php">
   		<?php include('errors.php'); ?>
+      <input type="name" name="name" placeholder="Name" required>
   	  <input type="text" name="username" value="<?php echo $username; ?>" placeholder="Username" required>
   	  <input type="email" name="email" value="<?php echo $email; ?>" placeholder="Email" required>
+      <input type="id" name="id" placeholder="ID" required>
 	  <select name="role" required>
         <option value="">Select Role</option>
         <option value="student">Student</option>
         <option value="advisor">Event Advisor</option>
         <option value="coordinator">Petakom Coordinator</option>
       </select>
-  	  <input type="password" name="password_1" placeholder="Password" required>
-  	  <input type="password" name="password_2" placeholder="Confirm password" required>
+  	  <input type="password" name="password" placeholder="Password" required>
   	  <button type="submit" class="btn" name="reg_user">Register</button>
 	</form>
   	<div class="links">
