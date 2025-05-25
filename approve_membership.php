@@ -1,10 +1,14 @@
-<?php
-session_start();
+<?php 
+session_start(); 
 
-// Redirect if not logged in or not coordinator
-if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'coordinator') {
-    header("Location: login.php");
-    exit();
+if (!isset($_SESSION['username'])) {
+  	$_SESSION['msg'] = "You must log in first";
+  	header('location: login.php');
+}
+if (isset($_GET['logout'])) {
+  	session_destroy();
+  	unset($_SESSION['username']);
+  	header("location: login.php");
 }
 
 // Dummy list of applications (replace with DB queries)
@@ -16,23 +20,8 @@ $membershipApplications = [
 // Handle approval (simulation)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
     $approvedId = $_POST['approve_id'];
-    // Here you'd update the DB to approve the application
+// Here you'd update the DB to approve the application
     $success = "Application ID $approvedId has been approved.";
-}
-
-$user = $_SESSION['user'];
-$role = $_SESSION['role'] ?? 'coordinator';
-
-// Determine dashboard based on role
-switch ($role) {
-    case 'coordinator':
-        $previous = 'coordinatorpage.php';
-        break;
-    case 'advisor':
-        $previous = 'advisorpage.php';
-        break;
-    default:
-        $previous = 'studentpage.php';
 }
 ?>
 
