@@ -1,7 +1,7 @@
 <?php 
 
 session_start();
-$conn = mysqli_connect('localhost', 'root', '' , 'mypetakom') or die ('Unable to connect');
+$conn = mysqli_connect('127.0.0.1:3307', 'root', '' , 'mypetakom') or die ('Unable to connect');
 ?>
 
 <!DOCTYPE html>
