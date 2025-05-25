@@ -1,22 +1,15 @@
-<?php
-session_start();
-$host = "127.0.0.1:3307";
-$username = "root";      // use your DB username
-$password = "";          // use your DB password
-$database = "mypetakom";   // your DB name
+<?php 
+  session_start(); 
 
-$conn = new mysqli($host, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Redirect if not logged in
-if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'student') {
-    header("Location: login.php");
-    exit();
-}
+  if (!isset($_SESSION['username'])) {
+  	$_SESSION['msg'] = "You must log in first";
+  	header('location: login.php');
+  }
+  if (isset($_GET['logout'])) {
+  	session_destroy();
+  	unset($_SESSION['username']);
+  	header("location: login.php");
+  }
 ?>
 
 <!DOCTYPE html>
@@ -28,9 +21,12 @@ if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'student') {
 </head>
 <body>
 <header>
+    <!-- logged in user information -->
     <img src="logo-petakom.png" alt="MyPetakom Logo" class="logo">
-    <h2>Welcome, <?php echo ucfirst($_SESSION['user']); ?>!</h2>
+    <?php  if (isset($_SESSION['username'])) : ?>
+    <h2>Welcome, <?php echo $_SESSION['username']; ?>!</h2>
     <a href="logout.php" class="logout-btn">Logout</a>
+    <?php endif ?>
 </header>
 
 <div class="dashboard-container">
