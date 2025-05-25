@@ -86,19 +86,19 @@ if (isset($_POST['login_user'])) {
         $_SESSION['username'] = $username;
         $_SESSION['role'] = 'student';
         $_SESSION['success'] = "You are now logged in as Student";
-        header('location: student/index.php');
+        header('location: index.php');
 
     } elseif (mysqli_num_rows($result_advisor) == 1) {
         $_SESSION['username'] = $username;
         $_SESSION['role'] = 'advisor';
         $_SESSION['success'] = "You are now logged in as Advisor";
-        header('location: advisor/index.php');
+        header('location: index.php');
 
     } elseif (mysqli_num_rows($result_coordinator) == 1) {
         $_SESSION['username'] = $username;
         $_SESSION['role'] = 'coordinator';
         $_SESSION['success'] = "You are now logged in as Coordinator";
-        header('location: coordinator/index.php');
+        header('location: index.php');
 
     } else {
         array_push($errors, "Wrong username/password combination");
