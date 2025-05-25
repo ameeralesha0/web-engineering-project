@@ -1,52 +1,39 @@
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $email = $_POST['email'];
-    $role = $_POST['role'];
-
-    // Dummy storage (replace with DB insert)
-    // You can also hash the password here using password_hash()
-
-    echo "<script>alert('Account for $name registered successfully!'); window.location.href='login.php';</script>";
-    exit();
-}
-?>
-
+<?php include('server.php') ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Register - MyPetakom</title>
-    <link rel="stylesheet" href="style.css">
+  <title>Registration system PHP and MySQL</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-<div class="login-container">
-    <div class="form-side1" >
-        <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
-        <h2>Register a New Account</h2>
-        <form method="post">
-            <input type="text" name="name" placeholder="Full Name" required>
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <select name="role" required>
-                <option value="">Select Role</option>
-                <option value="student">Student</option>
-                <option value="advisor">Event Advisor</option>
-                <option value="coordinator">Petakom Coordinator</option>
-            </select>
-            <button type="submit">Register</button>
-        </form>
-        <div class="links">
-            <a href="login.php">Already have an account? Login</a>
-        </div>
-    </div>
-    <div class="title-side">
-        <h1>WELCOME</h1>
-        <p>Join the PETAKOM community today!</p>
-    </div>
-</div>
+  <div class="header">
+  	<h2>Register</h2>
+  </div>
+	
+  <form method="post" action="register.php">
+  	<?php include('errors.php'); ?>
+  	<div class="input-group">
+  	  <label>Username</label>
+  	  <input type="text" name="username" value="<?php echo $username; ?>">
+  	</div>
+  	<div class="input-group">
+  	  <label>Email</label>
+  	  <input type="email" name="email" value="<?php echo $email; ?>">
+  	</div>
+  	<div class="input-group">
+  	  <label>Password</label>
+  	  <input type="password" name="password_1">
+  	</div>
+  	<div class="input-group">
+  	  <label>Confirm password</label>
+  	  <input type="password" name="password_2">
+  	</div>
+  	<div class="input-group">
+  	  <button type="submit" class="btn" name="reg_user">Register</button>
+  	</div>
+  	<p>
+  		Already a member? <a href="login.php">Sign in</a>
+  	</p>
+  </form>
 </body>
 </html>
