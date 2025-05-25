@@ -14,8 +14,8 @@
         <h2>Register a New Account</h2>
   	<form method="post" action="register.php">
   		<?php include('errors.php'); ?>
-  	  <input type="text" name="username" value="<?php echo $username; ?>" placeholder="Full Name" required>
-  	  <input type="email" name="email" value="<?php echo $email; ?>" placeholder="Username" required>
+  	  <input type="text" name="username" value="<?php echo $username; ?>" placeholder="Username" required>
+  	  <input type="email" name="email" value="<?php echo $email; ?>" placeholder="Email" required>
 	  <select name="role" required>
         <option value="">Select Role</option>
         <option value="student">Student</option>
