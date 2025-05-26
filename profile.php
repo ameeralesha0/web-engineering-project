@@ -11,7 +11,7 @@
   	header("location: login.php");
   }
 $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
-$user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : null;
 $email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
 ?>
 
