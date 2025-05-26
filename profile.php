@@ -1,42 +1,42 @@
-<?php 
-  session_start(); 
-  include("server.php"); // DB connection
+<?php
+include('server.php'); // Make sure this includes DB connection $db
 
-  if (!isset($_SESSION['username'])) {
+if (!isset($_SESSION['username'])) {
     $_SESSION['msg'] = "You must log in first";
     header('location: login.php');
     exit();
-  }
+}
 
-  $role = $_SESSION['role'];
-  $currentUsername = $_SESSION['username'];
+$username = $_SESSION['username'];
+$role = $_SESSION['role'];
+$email = null;
 
-  // Fetch current user info
-  $query = "SELECT * FROM users WHERE username = '$currentUsername' LIMIT 1";
-  $result = mysqli_query($db, $query);
-  $user = mysqli_fetch_assoc($result);
+// Determine table name based on role
+$table = '';
+if ($role === 'student') {
+    $table = 'student';
+} elseif ($role === 'advisor') {
+    $table = 'advisor';
+} elseif ($role === 'coordinator') {
+    $table = 'coordinator';
+} else {
+    die("Invalid user role.");
+}
 
-  $email = $user['email'];
-  $password = $user['password'];
-
-  // Handle form submission
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $newEmail = mysqli_real_escape_string($db, $_POST['email']);
-    $newUsername = mysqli_real_escape_string($db, $_POST['username']);
-    $newPassword = !empty($_POST['password']) ? md5($_POST['password']) : $password;
-
-    $update = "UPDATE users SET email='$newEmail', username='$newUsername', password='$newPassword' WHERE username='$currentUsername'";
-
-    if (mysqli_query($db, $update)) {
-      $_SESSION['username'] = $newUsername;
-      $_SESSION['email'] = $newEmail;
-
-      echo "<script>alert('Account updated successfully.'); window.location='profile.php';</script>";
-    } else {
-      echo "<script>alert('Failed to update account.');</script>";
-    }
-  }
+// Fetch user data from the appropriate table
+$query = "SELECT * FROM $table WHERE username = ?";
+$stmt = $db->prepare($query);
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result && $row = $result->fetch_assoc()) {
+    $email = $row['email'];
+    $_SESSION['email'] = $email; // Store it in session for reuse
+} else {
+    die("User not found in the $table table.");
+}
 ?>
+
 
 <!DOCTYPE html>
 <html>
