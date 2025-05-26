@@ -33,7 +33,7 @@ $previous = $_SERVER['HTTP_REFERER'] ?? 'Location: studentpage.php';
             <label>Upload Student Card:</label><br>
             <input type="file" name="student_card" required><br>
             <button type="submit">Apply</button>
-            <a href="<?= htmlspecialchars($previous) ?>"><button type="button">Back</button></a>
+            <a href="profile.php"><button type="button">Back</button></a>
         </form>
     </div>
 </body>
