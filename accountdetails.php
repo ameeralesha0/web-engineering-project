@@ -91,7 +91,7 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
     <h2>Account Details</h2>
     <div class="form-group">
         <label>Username:</label>
-        <input type="text" value="<?= htmlspecialchars($user) ?>" readonly>
+        <input type="text" value="<?= htmlspecialchars($username) ?>" readonly>
     </div>
     <div class="form-group">
         <label>Email Address:</label>
