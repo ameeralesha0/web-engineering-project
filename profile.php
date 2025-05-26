@@ -1,18 +1,41 @@
 <?php 
   session_start(); 
+  include("server.php"); // DB connection
 
   if (!isset($_SESSION['username'])) {
-  	$_SESSION['msg'] = "You must log in first";
-  	header('location: login.php');
+    $_SESSION['msg'] = "You must log in first";
+    header('location: login.php');
+    exit();
   }
-  if (isset($_GET['logout'])) {
-  	session_destroy();
-  	unset($_SESSION['username']);
-  	header("location: login.php");
+
+  $role = $_SESSION['role'];
+  $currentUsername = $_SESSION['username'];
+
+  // Fetch current user info
+  $query = "SELECT * FROM users WHERE username = '$currentUsername' LIMIT 1";
+  $result = mysqli_query($db, $query);
+  $user = mysqli_fetch_assoc($result);
+
+  $email = $user['email'];
+  $password = $user['password'];
+
+  // Handle form submission
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $newEmail = mysqli_real_escape_string($db, $_POST['email']);
+    $newUsername = mysqli_real_escape_string($db, $_POST['username']);
+    $newPassword = !empty($_POST['password']) ? md5($_POST['password']) : $password;
+
+    $update = "UPDATE users SET email='$newEmail', username='$newUsername', password='$newPassword' WHERE username='$currentUsername'";
+
+    if (mysqli_query($db, $update)) {
+      $_SESSION['username'] = $newUsername;
+      $_SESSION['email'] = $newEmail;
+
+      echo "<script>alert('Account updated successfully.'); window.location='profile.php';</script>";
+    } else {
+      echo "<script>alert('Failed to update account.');</script>";
+    }
   }
-$role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : null;
-$email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
 ?>
 
 <!DOCTYPE html>
@@ -24,8 +47,8 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
 <body>
     <div class="sidebar">
         <img src="logo-petakom.png" alt="MyPetakomLogo" class="logo">
-        
-        <form action="<?= htmlspecialchars($dashboard) ?>" method="get">
+
+        <form action="<?= htmlspecialchars($dashboard ?? '#') ?>" method="get">
             <button type="submit" class="blue-btn">Main</button>
         </form>
 
@@ -33,7 +56,6 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
             <button type="submit" class="blue-btn">Account Details</button>
         </form>
 
-        <!-- Display these buttons only if the role is 'student' -->
         <?php if ($role === 'student'): ?>
             <form action="membership.php">
                 <button type="submit" class="blue-btn">Manage Membership</button>
@@ -49,37 +71,35 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
             </form>
         <?php endif; ?>
 
-        <!-- Display these buttons only if the role is 'coordinator' -->
         <?php if ($role === 'coordinator'): ?>
             <form action="approve_membership.php">
                 <button type="submit" class="blue-btn">Manage Membership</button>
             </form>
-        <form action="merit.php">
-            <button type="submit" class="blue-btn">Manage Merit</button>
-        </form>
-        <form action="studentpage.php">
-            <button type="submit" class="blue-btn">Student Page</button>
-        </form>
-        <form action="report.php">
-            <button type="submit" class="blue-btn">Generate report</button>
-        </form>
-        <?php endif; ?>  
+            <form action="merit.php">
+                <button type="submit" class="blue-btn">Manage Merit</button>
+            </form>
+            <form action="studentpage.php">
+                <button type="submit" class="blue-btn">Student Page</button>
+            </form>
+            <form action="report.php">
+                <button type="submit" class="blue-btn">Generate report</button>
+            </form>
+        <?php endif; ?>
 
-        <!-- Display these buttons only if the role is 'advisor' -->
         <?php if ($role === 'advisor'): ?>
-        <form action="registration.php">
-            <button type="submit" class="blue-btn">Registration</button>
-        </form>
-        <form action="merit.php">
-            <button type="submit" class="blue-btn">Manage Merit</button>
-        </form>
-        <form action="eventcommittee.php">
-            <button type="submit" class="blue-btn">Event Committee</button>
-        </form>
-        <form action="qrcode.php">
-            <button type="submit" class="blue-btn">Qr Code</button>
-        </form>
-        <?php endif; ?> 
+            <form action="registration.php">
+                <button type="submit" class="blue-btn">Registration</button>
+            </form>
+            <form action="merit.php">
+                <button type="submit" class="blue-btn">Manage Merit</button>
+            </form>
+            <form action="eventcommittee.php">
+                <button type="submit" class="blue-btn">Event Committee</button>
+            </form>
+            <form action="qrcode.php">
+                <button type="submit" class="blue-btn">Qr Code</button>
+            </form>
+        <?php endif; ?>
 
         <form action="coordinatordashboard.php">
             <button type="submit" class="blue-btn">Dashboard</button>
@@ -98,11 +118,11 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
             </div>
             <div class="form-group">
                 <label>Username:</label>
-                <input type="text" name="username" value="<?= htmlspecialchars($username) ?>" required>
+                <input type="text" name="username" value="<?= htmlspecialchars($currentUsername) ?>" required>
             </div>
             <div class="form-group">
                 <label>Password:</label>
-                <input type="password" name="password" placeholder="Enter new password">
+                <input type="password" name="password" placeholder="Leave blank to keep current password">
             </div>
             <button type="submit" class="submit-btn">Submit</button>
         </form>
