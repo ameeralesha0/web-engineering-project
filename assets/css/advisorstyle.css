@@ -1,0 +1,187 @@
+/* ===== Advisor Dashboard Base Styles ===== */
+.advisor-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ===== Dashboard Header ===== */
+.advisor-header {
+    background: linear-gradient(135deg, #2471a3 0%, #1a5276 100%);
+    color: #fdfefe;
+    padding: 1rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.advisor-brand {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #f7dc6f;
+}
+
+/* ===== Navigation Sidebar ===== */
+.advisor-sidebar {
+    background-color: #fdfefe;
+    min-height: 100vh;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+.advisor-nav {
+    padding-top: 1rem;
+}
+
+.advisor-nav .nav-link {
+    color: #2471a3;
+    padding: 0.75rem 1.5rem;
+    margin: 0.25rem 0;
+    border-radius: 0 30px 30px 0;
+    transition: all 0.3s;
+}
+
+.advisor-nav .nav-link:hover,
+.advisor-nav .nav-link.active {
+    background-color: rgba(118, 215, 196, 0.2);
+    color: #1a5276;
+}
+
+.advisor-nav .nav-link i {
+    color: #76d7c4;
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+/* ===== Dashboard Cards ===== */
+.advisor-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+    margin-bottom: 1.5rem;
+}
+
+.advisor-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-attendance {
+    border-left: 4px solid #76d7c4;
+}
+
+.card-events {
+    border-left: 4px solid #f7dc6f;
+}
+
+.card-students {
+    border-left: 4px solid #2471a3;
+}
+
+.card-stat {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.card-title {
+    color: #2471a3;
+    font-weight: 600;
+}
+
+/* ===== Data Tables ===== */
+.advisor-table {
+    background-color: #fdfefe;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.advisor-table th {
+    background-color: #2471a3;
+    color: #fdfefe;
+    font-weight: 500;
+}
+
+.advisor-table td {
+    vertical-align: middle;
+}
+
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-present {
+    background-color: rgba(118, 215, 196, 0.2);
+    color: #16a085;
+}
+
+.badge-late {
+    background-color: rgba(247, 220, 111, 0.2);
+    color: #f39c12;
+}
+
+.badge-absent {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 992px) {
+    .advisor-sidebar {
+        min-height: auto;
+    }
+    
+    .advisor-content {
+        padding-top: 2rem;
+    }
+}
+/* ===== New Components ===== */
+.btn-back {
+    background-color: #f7dc6f;
+    color: #333;
+    border: none;
+    margin-right: 10px;
+}
+
+.btn-back:hover {
+    background-color: #f5d34d;
+    color: #333;
+}
+
+.sidebar-divider {
+    border-top: 1px solid rgba(36, 113, 163, 0.1);
+    margin: 1rem 0;
+}
+
+.sidebar-heading {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #2471a3;
+    padding: 0 1.5rem;
+    margin-top: 1rem;
+}
+/* Quick Action Buttons */
+.btn-action {
+    background-color: #fdfefe;
+    border: 1px solid #76d7c4;
+    color: #2471a3;
+    transition: all 0.3s;
+}
+
+.btn-action:hover {
+    background-color: #76d7c4;
+    color: #fdfefe;
+    transform: translateY(-2px);
+}
+
+/* List Group Items */
+.list-group-item {
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.list-group-item:hover {
+    border-left-color: #f7dc6f;
+    background-color: rgba(118, 215, 196, 0.05);
+}
