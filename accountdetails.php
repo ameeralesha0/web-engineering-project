@@ -101,7 +101,7 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : null;
         <label>Role:</label>
         <input type="text" value="<?= htmlspecialchars($role) ?>" readonly>
     </div>
-    <a href="<?= htmlspecialchars($previous) ?>"><button type="button" class="back-btn">Back</button></a>
+    <button type="button" class="back-btn" onclick="history.back()">Back</button>
 </div>
 </body>
 </html> 
