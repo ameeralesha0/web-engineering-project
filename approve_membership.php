@@ -1,27 +1,41 @@
 <?php 
-session_start(); 
+session_start();
 
+// Database connection
+$db = mysqli_connect('127.0.0.1:3307', 'root', '', 'mypetakom');
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Redirect if not logged in
 if (!isset($_SESSION['username'])) {
-  	$_SESSION['msg'] = "You must log in first";
-  	header('location: login.php');
-}
-if (isset($_GET['logout'])) {
-  	session_destroy();
-  	unset($_SESSION['username']);
-  	header("location: login.php");
+    $_SESSION['msg'] = "You must log in first";
+    header('location: login.php');
+    exit();
 }
 
-// Dummy list of applications (replace with DB queries)
-$membershipApplications = [
-    ['id' => 1, 'name' => 'John Doe', 'student_card' => 'approved-id.jpg'],
-    ['id' => 2, 'name' => 'Jane Smith', 'student_card' => 'rejected-id.jpg']
-];
+// Handle approval/rejection
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_id'], $_POST['action'])) {
+    $membershipId = mysqli_real_escape_string($db, $_POST['membership_id']);
+    $action = $_POST['action']; // 'approve' or 'reject'
 
-// Handle approval (simulation)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
-    $approvedId = $_POST['approve_id'];
-// Here you'd update the DB to approve the application
-    $success = "Application ID $approvedId has been approved.";
+    if ($action === 'approve' || $action === 'reject') {
+        $query = "UPDATE membership SET status = '$action' WHERE membership_id = '$membershipId'";
+        if (mysqli_query($db, $query)) {
+            $_SESSION['success'] = "Membership ID $membershipId has been " . $action . "d.";
+        } else {
+            $_SESSION['error'] = "Error updating status: " . mysqli_error($db);
+        }
+        header("Location: approve_membership.php");
+        exit();
+    }
+}
+
+// Fetch applications (only those not approved)
+$membershipApplications = [];
+$result = mysqli_query($db, "SELECT * FROM membership WHERE status != 'approved'");
+while ($row = mysqli_fetch_assoc($result)) {
+    $membershipApplications[] = $row;
 }
 ?>
 
@@ -33,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
     <link rel="stylesheet" href="styleapprovemem.css">
 </head>
 <body>
-    <div class="sidebar">
+<div class="sidebar">
     <img src="logo-petakom.png" alt="Logo">
     <form action="coordinatorpage.php">
         <button type="submit" class="blue-btn">Main</button>
@@ -41,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
     <button onclick="location.href='accountdetails.php'" class="blue-btn">Account Details</button>
     <form action="profile.php">
         <button type="submit" class="blue-btn">Manage Account</button>
-    </form> 
+    </form>
     <form action="merit.php">
         <button type="submit" class="blue-btn">Manage Merit</button>
     </form>
@@ -49,34 +63,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
         <button type="submit" class="blue-btn">Student Page</button>
     </form>
     <form action="report.php">
-        <button type="submit" class="blue-btn">Generate report</button>
+        <button type="submit" class="blue-btn">Generate Report</button>
     </form>
     <form action="coordinatordashboard.php">
         <button type="submit" class="blue-btn">Dashboard</button>
     </form>
-    <button onclick="location.href='logout.php'" class="logout">Logout</a>
+    <button onclick="location.href='logout.php'" class="logout">Logout</button>
 </div>
 
-    <div class="main">
-        <div class="top-bar">
-            <div class="title">Approve Membership</div>
-        </div>
+<div class="main">
+    <div class="top-bar">
+        <div class="title">Approve Membership</div>
+    </div>
 
-        <?php if (isset($success)) echo "<p class='success'>$success</p>"; ?>
+    <?php if (isset($_SESSION['success'])): ?>
+        <p class="success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></p>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error'])): ?>
+        <p class="error"><?= $_SESSION['error']; unset($_SESSION['error']); ?></p>
+    <?php endif; ?>
 
+    <?php if (count($membershipApplications) === 0): ?>
+        <p>No membership applications pending approval.</p>
+    <?php else: ?>
         <?php foreach ($membershipApplications as $app): ?>
             <div class="application">
-                <strong>Applicant Name:</strong> <?= htmlspecialchars($app['name']) ?><br>
-                <strong>Student Card:</strong><br>
-                <img src="<?= htmlspecialchars($app['student_card']) ?>" alt="Student Card"><br>
-                <form method="post">
-                    <input type="hidden" name="approve_id" value="<?= $app['id'] ?>">
-                    <button type="submit" class="approve-btn">Approve</button>
+                <strong>Membership ID:</strong> <?= htmlspecialchars($app['membership_id']) ?><br>
+                <strong>Student ID:</strong> <?= htmlspecialchars($app['student_id']) ?><br>
+                <strong>Name:</strong> <?= htmlspecialchars($app['membership_name']) ?><br>
+                <strong>Status:</strong> <?= htmlspecialchars($app['status']) ?><br>
+
+                <form method="post" style="margin-top: 10px;">
+                    <input type="hidden" name="membership_id" value="<?= $app['membership_id'] ?>">
+                    <button type="submit" name="action" value="approve" class="approve-btn">Approve</button>
+                    <button type="submit" name="action" value="reject" class="reject-btn">Reject</button>
                 </form>
             </div>
         <?php endforeach; ?>
-    </div>
+    <?php endif; ?>
 </div>
-
 </body>
 </html>
