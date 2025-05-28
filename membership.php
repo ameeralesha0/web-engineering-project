@@ -1,17 +1,21 @@
-<!-- register.php -->
 <?php
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
     $password = $_POST['password'];
     $student_card = $_FILES['student_card'];
 
-    // Dummy upload logic (implement validation and storage)
-    move_uploaded_file($student_card['tmp_name'], 'uploads/' . $student_card['name']);
-    echo "<p>Registration successful. Please wait for verification.</p>";
+    $upload_dir = 'uploads/';
+
+    $target_file = $upload_dir . basename($student_card['name']);
+
+    // Move uploaded file and check success
+    if (move_uploaded_file($student_card['tmp_name'], $target_file)) {
+        echo "<p>Registration successful. Please wait for verification.</p>";
+    } else {
+        echo "<p>Error uploading file.</p>";
+    }
 }
-$previous = $_SERVER['HTTP_REFERER'] ?? 'Location: studentpage.php';
 ?>
 
 <!DOCTYPE html>
