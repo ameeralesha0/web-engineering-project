@@ -2,7 +2,7 @@
 include('server.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $email = mysqli_real_escape_string($db, $_POST['email']);
     $user = null;
     $role = '';
 
@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tables = ['student', 'advisor', 'petakom_coordinator'];
     foreach ($tables as $table) {
         $query = "SELECT * FROM $table WHERE email='$email' LIMIT 1";
-        $result = mysqli_query($conn, $query);
+        $result = mysqli_query($db, $query);
         if ($result && mysqli_num_rows($result) > 0) {
             $user = mysqli_fetch_assoc($result);
             $role = $table;
