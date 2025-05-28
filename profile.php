@@ -147,6 +147,10 @@ if ($result && $row = $result->fetch_assoc()) {
             </div>
             <button type="submit" class="submit-btn">Submit</button>
         </form>
+        <?php if (isset($_SESSION['success'])): ?>
+        <p class="success"><?= htmlspecialchars($_SESSION['success']) ?></p>
+        <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
     </div>
 </body>
 </html>
