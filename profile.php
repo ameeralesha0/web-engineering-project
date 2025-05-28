@@ -69,9 +69,14 @@ if ($result && $row = $result->fetch_assoc()) {
     <div class="sidebar">
         <img src="logo-petakom.png" alt="MyPetakomLogo" class="logo" />
 
-        <form action="<?= htmlspecialchars($dashboard ?? '#') ?>" method="get">
-            <button type="submit" class="blue-btn">Main</button>
-        </form>
+        <!-- Main Button Based on Role -->
+        <?php if ($role === 'student'): ?>
+            <form action="studentpage.php"><button type="submit" class="blue-btn">Main</button></form>
+        <?php elseif ($role === 'advisor'): ?>
+            <form action="advisorpage.php"><button type="submit" class="blue-btn">Main</button></form>
+        <?php elseif ($role === 'coordinator'): ?>
+            <form action="coordinatorpage.php"><button type="submit" class="blue-btn">Main</button></form>
+        <?php endif; ?>
 
         <form action="accountdetails.php">
             <button type="submit" class="blue-btn">Account Details</button>
