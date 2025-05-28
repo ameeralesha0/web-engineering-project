@@ -5,15 +5,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = mysqli_real_escape_string($db, $_POST['email']);
     $user = null;
     $role = '';
+    $emailColumn = '';
 
-    // Check in each user table
-    $tables = ['student', 'advisor', 'petakom_coordinator'];
-    foreach ($tables as $table) {
-        $query = "SELECT * FROM $table WHERE email='$email' LIMIT 1";
+    // Table => Email column mapping
+    $tables = [
+        'student' => 'student_email',
+        'advisor' => 'advisor_email',
+        'petakom_coordinator' => 'staff_email'
+    ];
+
+    foreach ($tables as $table => $emailCol) {
+        $query = "SELECT * FROM $table WHERE $emailCol = '$email' LIMIT 1";
         $result = mysqli_query($db, $query);
         if ($result && mysqli_num_rows($result) > 0) {
             $user = mysqli_fetch_assoc($result);
             $role = $table;
+            $emailColumn = $emailCol;
             break;
         }
     }
@@ -26,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Save token into a new table `password_resets`
         $insert = "INSERT INTO password_resets (email, token, expires_at) 
                    VALUES ('$email', '$token', '$expires')";
-        mysqli_query($conn, $insert);
+        mysqli_query($db, $insert);
 
         // Send reset link
         $resetLink = "http://yourdomain.com/reset_password.php?token=$token";
@@ -43,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Email not found.";
     }
 }
-
 ?>
 
 <!DOCTYPE html>
