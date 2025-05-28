@@ -3,12 +3,12 @@ include('server.php');
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['token'], $_POST['password'])) {
-    $token = mysqli_real_escape_string($conn, $_POST['token']);
+    $token = mysqli_real_escape_string($db, $_POST['token']);
     $newPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // Find token
     $query = "SELECT * FROM password_resets WHERE token='$token' AND expires_at > NOW() LIMIT 1";
-    $result = mysqli_query($conn, $query);
+    $result = mysqli_query($db, $query);
     if ($result && mysqli_num_rows($result) > 0) {
         $resetData = mysqli_fetch_assoc($result);
         $email = $resetData['email'];
@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['token'], $_POST['passw
         $updated = false;
         foreach ($tables as $table) {
             $update = "UPDATE $table SET password='$newPassword' WHERE email='$email'";
-            if (mysqli_query($conn, $update) && mysqli_affected_rows($conn) > 0) {
+            if (mysqli_query($db, $update) && mysqli_affected_rows($db) > 0) {
                 $updated = true;
                 break;
             }
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['token'], $_POST['passw
 
         if ($updated) {
             // Delete token after successful reset
-            mysqli_query($conn, "DELETE FROM password_resets WHERE token='$token'");
+            mysqli_query($db, "DELETE FROM password_resets WHERE token='$token'");
             $message = "Your password has been reset successfully. <a href='login.php'>Login here</a>";
         } else {
             $error = "Password reset failed. User not found.";
