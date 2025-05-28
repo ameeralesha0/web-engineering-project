@@ -1,5 +1,4 @@
 <?php
-session_start();
 include('server.php');
 
 // Handle form submission
