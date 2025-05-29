@@ -1,4 +1,9 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+// Load Composer's autoloader
+require 'vendor/autoload.php';
 include('server.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -35,16 +40,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                    VALUES ('$email', '$token', '$expires')";
         mysqli_query($db, $insert);
 
-        // Send reset link
+        // Prepare email
         $resetLink = "http://yourdomain.com/reset_password.php?token=$token";
-        $subject = "MyPetakom Password Reset";
-        $body = "Click this link to reset your password: $resetLink";
-        $headers = "From: no-reply@mypetakom.com";
 
-        if (mail($email, $subject, $body, $headers)) {
+        $mail = new PHPMailer(true);
+
+        try {
+            // SMTP configuration (replace with your Mailtrap details)
+            // Looking to send emails in production? Check out our Email API/SMTP product!
+            $phpmailer = new PHPMailer();
+            $phpmailer->isSMTP();
+            $phpmailer->Host = 'sandbox.smtp.mailtrap.io';
+            $phpmailer->SMTPAuth = true;
+            $phpmailer->Port = 2525;
+            $phpmailer->Username = 'ef2553e427d7c2';
+            $phpmailer->Password = 'd7a2f83cb903e6';
+
+            // Sender and recipient
+            $mail->setFrom('no-reply@mypetakom.com', 'MyPetakom');
+            $mail->addAddress($email);
+
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = 'MyPetakom Password Reset';
+            $mail->Body    = "Click this link to reset your password: <a href='$resetLink'>$resetLink</a>";
+
+            $mail->send();
             $message = "A password reset link has been sent to your email.";
-        } else {
-            $error = "Failed to send reset email. Please try again.";
+        } catch (Exception $e) {
+            $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
     } else {
         $error = "Email not found.";
