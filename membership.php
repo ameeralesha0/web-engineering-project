@@ -52,10 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit">Apply</button>
             <a href="profile.php"><button type="button">Back</button></a>
         </form>
-    </div>
-    <?php
-// Your membership display logic here
-if ($membership) {
+        <?php 
+        // Your membership display logic here
+    if ($membership) {
     if ($membership['status'] === 'approved') {
         // Show membership details
         echo "<h2>Your Membership Details</h2>";
@@ -80,9 +79,10 @@ if ($membership) {
         // Pending or other statuses
         echo "<h2>Your membership application is still pending approval.</h2>";
     }
-} else {
-    echo "<p>You have not applied for membership yet.</p>";
-}
-?>
+    } else {
+        echo "<p>You have not applied for membership yet.</p>";
+    }
+    ?>
+    </div>
 </body>
 </html>
