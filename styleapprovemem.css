@@ -7,12 +7,17 @@ body {
 }
 
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 200px;
+    height: 100vh;
     background-color: #c6dbef;
     padding: 20px;
-    height: 100vh;
     box-sizing: border-box;
+    overflow-y: auto; /* Optional: adds scrollbar inside sidebar if content is tall */
 }
+
 
 .sidebar button, .sidebar img {
     display: block;
@@ -56,10 +61,12 @@ body {
 }
 
 .main {
-    flex-grow: 1;
+    margin-left: 200px; /* Same width as sidebar */
     padding: 30px;
     box-sizing: border-box;
+    flex-grow: 1; /* keep flexible if you want */
 }
+
 
 .top-bar {
     display: flex;
@@ -111,11 +118,11 @@ body {
 }
 
 .reject-btn {
-    background: #dc3545;
+    background: #dc3545 !important;
 }
 
 .reject-btn:hover {
-    background: #c82333;
+    background: #c82333 !important;
 }
 
 .success {
