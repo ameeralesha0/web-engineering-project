@@ -1,4 +1,5 @@
 <?php
+include('server.php');
 $uploadMessage = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
