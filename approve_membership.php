@@ -1,11 +1,5 @@
 <?php 
-session_start();
-
-// Database connection
-$db = mysqli_connect('127.0.0.1:3307', 'root', '', 'mypetakom');
-if (!$db) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+include('server.php');
 
 // Redirect if not logged in
 if (!isset($_SESSION['username'])) {
@@ -19,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_id'], $_PO
     $membershipId = mysqli_real_escape_string($db, $_POST['membership_id']);
     $action = $_POST['action']; // 'approve' or 'reject'
 
-    if ($action === 'approve' || $action === 'reject') {
+    if (in_array($action, ['approve', 'reject'])) {
         $query = "UPDATE membership SET status = '$action' WHERE membership_id = '$membershipId'";
         if (mysqli_query($db, $query)) {
             $_SESSION['success'] = "Membership ID $membershipId has been " . $action . "d.";
@@ -31,11 +25,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_id'], $_PO
     }
 }
 
-// Fetch applications (only those not approved)
+// Fetch applications (only those not approved), and join student for full info
 $membershipApplications = [];
-$result = mysqli_query($db, "SELECT * FROM membership WHERE status != 'approved'");
-while ($row = mysqli_fetch_assoc($result)) {
-    $membershipApplications[] = $row;
+$query = "
+    SELECT membership.*, student.student_name 
+    FROM membership 
+    JOIN student ON membership.student_id = student.student_id 
+    WHERE membership.status != 'approved'
+";
+$result = mysqli_query($db, $query);
+
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $membershipApplications[] = $row;
+    }
+} else {
+    $_SESSION['error'] = "Error fetching applications: " . mysqli_error($db);
 }
 ?>
 
@@ -77,10 +82,10 @@ while ($row = mysqli_fetch_assoc($result)) {
     </div>
 
     <?php if (isset($_SESSION['success'])): ?>
-        <p class="success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></p>
+        <p class="success"><?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></p>
     <?php endif; ?>
     <?php if (isset($_SESSION['error'])): ?>
-        <p class="error"><?= $_SESSION['error']; unset($_SESSION['error']); ?></p>
+        <p class="error"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></p>
     <?php endif; ?>
 
     <?php if (count($membershipApplications) === 0): ?>
@@ -90,11 +95,17 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="application">
                 <strong>Membership ID:</strong> <?= htmlspecialchars($app['membership_id']) ?><br>
                 <strong>Student ID:</strong> <?= htmlspecialchars($app['student_id']) ?><br>
-                <strong>Name:</strong> <?= htmlspecialchars($app['membership_name']) ?><br>
+                <strong>Student Name:</strong> <?= htmlspecialchars($app['student_name']) ?><br>
+                <strong>Club Name:</strong> <?= htmlspecialchars($app['membership_name']) ?><br>
                 <strong>Status:</strong> <?= htmlspecialchars($app['status']) ?><br>
 
+                <?php if (!empty($app['upload_card'])): ?>
+                    <strong>Uploaded Card:</strong><br>
+                    <img src="uploads/<?= htmlspecialchars($app['upload_card']) ?>" alt="Uploaded Card" style="max-width: 200px;"><br>
+                <?php endif; ?>
+
                 <form method="post" style="margin-top: 10px;">
-                    <input type="hidden" name="membership_id" value="<?= $app['membership_id'] ?>">
+                    <input type="hidden" name="membership_id" value="<?= htmlspecialchars($app['membership_id']) ?>">
                     <button type="submit" name="action" value="approve" class="approve-btn">Approve</button>
                     <button type="submit" name="action" value="reject" class="reject-btn">Reject</button>
                 </form>
