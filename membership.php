@@ -10,10 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $target_file = $upload_dir . basename($student_card['name']);
 
     // Move uploaded file and check success
-    if (move_uploaded_file($student_card['tmp_name'], $destinationPath)) {
-    echo "<p class='success'>✅ Your student card has been uploaded successfully.<br>Please wait while we verify your registration.</p>";
+    if (move_uploaded_file($student_card['tmp_name'], $target_file)) {
+        echo "<p class='success'>✅ Your student card has been uploaded successfully.<br>Please wait while we verify your registration.</p>";
     } else {
-    echo "<p class='error'>❌ Upload failed. Please try again or check the file format and size.</p>";
+        echo "<p class='error'>❌ Upload failed. Please try again or check the file format and size.</p>";
     }
 }
 ?>
