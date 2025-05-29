@@ -13,10 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_id'], $_PO
     $membershipId = mysqli_real_escape_string($db, $_POST['membership_id']);
     $action = $_POST['action']; // 'approve' or 'reject'
 
-    if (in_array($action, ['approve', 'reject'])) {
-        $query = "UPDATE membership SET status = '$action' WHERE membership_id = '$membershipId'";
+    if ($action === 'approve' || $action === 'reject') {
+        // Use correct status values as in your DB enum
+        $status = ($action === 'approve') ? 'approved' : 'rejected';
+
+        $query = "UPDATE membership SET status = '$status' WHERE membership_id = '$membershipId'";
         if (mysqli_query($db, $query)) {
-            $_SESSION['success'] = "Membership ID $membershipId has been " . $action . "d.";
+            $_SESSION['success'] = "Membership ID $membershipId has been " . $status . ".";
         } else {
             $_SESSION['error'] = "Error updating status: " . mysqli_error($db);
         }
@@ -24,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_id'], $_PO
         exit();
     }
 }
+
 
 // Fetch applications (only those not approved), and join student for full info
 $membershipApplications = [];
