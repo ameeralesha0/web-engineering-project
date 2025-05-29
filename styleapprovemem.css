@@ -1,8 +1,9 @@
 body {
     display: flex;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     background-color: white;
     margin: 0;
+    padding: 0;
 }
 
 .sidebar {
@@ -10,6 +11,7 @@ body {
     background-color: #c6dbef;
     padding: 20px;
     height: 100vh;
+    box-sizing: border-box;
 }
 
 .sidebar button, .sidebar img {
@@ -26,6 +28,7 @@ body {
     background: #0275d8;
     color: white;
 }
+
 .sidebar .blue-btn:hover {
     background: #025aa5;
 }
@@ -34,6 +37,7 @@ body {
     background: #6c757d;
     color: white;
 }
+
 .back-btn:hover {
     background: #495057;
 }
@@ -44,7 +48,9 @@ body {
     padding: 10px 20px;
     text-decoration: none;
     border-radius: 5px;
+    cursor: pointer;
 }
+
 .logout:hover {
     background: #c9302c;
 }
@@ -52,6 +58,7 @@ body {
 .main {
     flex-grow: 1;
     padding: 30px;
+    box-sizing: border-box;
 }
 
 .top-bar {
@@ -70,27 +77,71 @@ body {
     border: 1px solid #ccc;
     padding: 20px;
     border-radius: 10px;
+    background-color: #f9f9f9;
 }
+
 .application img {
-    max-width: 150px;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #aaa;
+    border-radius: 5px;
     margin-bottom: 10px;
 }
+
 .application form {
     margin-top: 10px;
 }
 
-.approve-btn {
-    background: green;
-    color: white;
+.approve-btn,
+.reject-btn {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
+    color: white;
     cursor: pointer;
+    margin-right: 10px;
 }
+
+.approve-btn {
+    background: green;
+}
+
 .approve-btn:hover {
     background: darkgreen;
 }
 
+.reject-btn {
+    background: #dc3545;
+}
+
+.reject-btn:hover {
+    background: #c82333;
+}
+
 .success {
     color: green;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.error {
+    color: red;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    .main {
+        padding: 15px;
+    }
 }
