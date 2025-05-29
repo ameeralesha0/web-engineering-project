@@ -2,7 +2,6 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Load Composer's autoloader
 require 'vendor/autoload.php';
 include('server.php');
 
@@ -46,15 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $mail = new PHPMailer(true);
 
         try {
-            // SMTP configuration (replace with your Mailtrap details)
-            // Looking to send emails in production? Check out our Email API/SMTP product!
-            $phpmailer = new PHPMailer();
-            $phpmailer->isSMTP();
-            $phpmailer->Host = 'sandbox.smtp.mailtrap.io';
-            $phpmailer->SMTPAuth = true;
-            $phpmailer->Port = 2525;
-            $phpmailer->Username = 'ef2553e427d7c2';
-            $phpmailer->Password = 'd7a2f83cb903e6';
+            // SMTP Configuration
+            $mail->isSMTP();
+            $mail->Host = 'sandbox.smtp.mailtrap.io'; // replace with your Mailtrap host
+            $mail->SMTPAuth = true;
+            $mail->Username = 'ef2553e427d7c2';       // replace with your Mailtrap username
+            $mail->Password = 'd7a2f83cb903e6';       // replace with your Mailtrap password
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 2525;
 
             // Sender and recipient
             $mail->setFrom('no-reply@mypetakom.com', 'MyPetakom');
@@ -75,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
