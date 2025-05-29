@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (move_uploaded_file($student_card['tmp_name'], $destinationPath)) {
         // Update or insert membership record with the uploaded card and set status to 'pending'
-        $student_id = $_SESSION['username'];
+        $student_id = $_SESSION['student_id'];
 
         // Check if membership already exists
         $checkQuery = "SELECT membership_id FROM membership WHERE student_id = ?";
