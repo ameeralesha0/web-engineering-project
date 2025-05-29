@@ -53,8 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $uploadMessage = "<p class='error'>❌ Upload failed. Please try again or check the file format and size.</p>";
     }
-} else {
+    } else {
     $uploadMessage = "<p class='error'>❌ No file uploaded or upload error.</p>";
+    }
 }
     $student_id = $_SESSION['username'];
 
@@ -65,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $stmt->get_result();
     $membership = $result->fetch_assoc();
     $stmt->close();
-}
 ?>
 
 
