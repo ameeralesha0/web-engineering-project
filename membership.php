@@ -3,21 +3,24 @@ include('server.php');
 $uploadMessage = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $student_card = $_FILES['student_card'];
+    $student_card = $_FILES['student_card'] ?? null;
 
-    $uploadDirectory = 'uploads/';
-    $fileName = basename($student_card['name']);
-    $destinationPath = $uploadDirectory . $fileName;
+    // Handle file upload only
+    if ($student_card && $student_card['error'] === UPLOAD_ERR_OK) {
+        $uploadDirectory = 'uploads/';
+        $fileName = basename($student_card['name']);
+        $destinationPath = $uploadDirectory . $fileName;
 
-    if (move_uploaded_file($student_card['tmp_name'], $destinationPath)) {
-        $uploadMessage = "<p class='success'>✅ Your student card has been uploaded successfully.<br>Please wait while we verify your registration.</p>";
+        if (move_uploaded_file($student_card['tmp_name'], $destinationPath)) {
+            $uploadMessage = "<p class='success'>✅ Your student card has been uploaded successfully.<br>Please wait while we verify your registration.</p>";
+        } else {
+            $uploadMessage = "<p class='error'>❌ Upload failed. Please try again or check the file format and size.</p>";
+        }
     } else {
-        $uploadMessage = "<p class='error'>❌ Upload failed. Please try again or check the file format and size.</p>";
+        $uploadMessage = "<p class='error'>❌ No file uploaded or upload error.</p>";
     }
 }
+
     $student_id = $_SESSION['username'];
 
     $query = "SELECT * FROM membership WHERE student_id = ?";
