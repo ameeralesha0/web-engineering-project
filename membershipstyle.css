@@ -69,3 +69,14 @@ a button {
     background-color: #6c757d;
     margin-top: 20px;
 }
+
+.success {
+    color: green;
+    font-weight: bold;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+}
+
