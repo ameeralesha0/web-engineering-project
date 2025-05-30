@@ -54,6 +54,7 @@ body {
     padding: 40px;
     box-sizing: border-box;
     width: calc(100% - 200px);
+    justify-content: flex-start;
 }
 
 .top-bar .title {
