@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (move_uploaded_file($student_card['tmp_name'], $destinationPath)) {
         // Update or insert membership record with the uploaded card and set status to 'pending'
-        $student_id = $_SESSION['student_id'];
+        $student_id = $_SESSION['username'];
 
         // Check if membership already exists
         $checkQuery = "SELECT membership_id FROM membership WHERE student_id = ?";
@@ -68,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close();
 ?>
 
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -91,19 +90,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit">Apply</button>
             <a href="profile.php"><button type="button">Back</button></a>
         </form>
+
         <?php 
         // Your membership display logic here
-    if ($membership) {
-    if ($membership['status'] === 'approved') {
+        if ($membership) {
+        if ($membership['status'] === 'approved') {
         // Show membership details
-        echo "<h2>Your Membership Details</h2>";
-        echo "Membership ID: " . htmlspecialchars($membership['membership_id']) . "<br>";
-        echo "Name: " . htmlspecialchars($membership['membership_name']) . "<br>";
-        echo "Status: " . htmlspecialchars($membership['status']) . "<br>";
-        echo "<img src='uploads/" . htmlspecialchars($membership['upload_card']) . "' alt='Membership Card' width='200'>";
-    } elseif ($membership['status'] === 'rejected') {
-        // Show rejection message + reupload form
-        echo "<h2>Your membership application was rejected. Please reupload your membership card.</h2>";
+            echo "<h2>Your Membership Details</h2>";
+            echo "Membership ID: " . htmlspecialchars($membership['membership_id']) . "<br>";
+            echo "Name: " . htmlspecialchars($membership['membership_name']) . "<br>";
+            echo "Status: " . htmlspecialchars($membership['status']) . "<br>";
+            echo "<img src='uploads/" . htmlspecialchars($membership['upload_card']) . "' alt='Membership Card' width='200'>";
+        } elseif ($membership['status'] === 'rejected') {
+            // Show rejection message + reupload form
+            echo "<h2>Your membership application was rejected. Please reupload your membership card.</h2>";
 
         if (isset($_SESSION['upload_error'])) {
             echo "<p style='color:red'>" . $_SESSION['upload_error'] . "</p>";
@@ -114,13 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo '<input type="file" name="membership_card" required>';
         echo '<button type="submit">Upload Card</button>';
         echo '</form>';
-    } else {
-        // Pending or other statuses
-        echo "<h2>Your membership application is still pending approval.</h2>";
-    }
-    } else {
-        echo "<p>You have not applied for membership yet.</p>";
-    }
+        } else {
+            // Pending or other statuses
+            echo "<h2>Your membership application is still pending approval.</h2>";
+        }
+        } 
+        else {
+            echo "<p>You have not applied for membership yet.</p>";
+        }
     ?>
     </div>
 </body>
