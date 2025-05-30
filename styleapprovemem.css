@@ -12,6 +12,7 @@ body {
     height: 100vh;
     background-color: #c6dbef;
     padding: 20px;
+    overflow-y: auto; /* Optional: adds scrollbar inside sidebar if content is tall */
 }
 
 .sidebar button, .sidebar img {
