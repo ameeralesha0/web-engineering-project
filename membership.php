@@ -22,6 +22,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Update or insert membership record with the uploaded card and set status to 'pending'
         $student_id = $_SESSION['username'];
 
+        // Check if student exists
+        $checkStudent = $db->prepare("SELECT student_id FROM student WHERE student_id = ?");
+        $checkStudent->bind_param("s", $student_id);
+        $checkStudent->execute();
+        $resultStudent = $checkStudent->get_result();
+
+        if ($resultStudent->num_rows === 0) {
+        die("❌ Error: Student ID '$student_id' not found in the student table. Please make sure the student is registered.");
+        }
+        $checkStudent->close();
+
         // Check if membership already exists
         $checkQuery = "SELECT membership_id FROM membership WHERE student_id = ?";
         $stmtCheck = $db->prepare($checkQuery);
