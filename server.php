@@ -30,6 +30,7 @@ if (isset($_POST['reg_user'])) {
     // check if user already exists
     if ($role === 'student') {
         $check_query = "SELECT * FROM student WHERE student_username='$username' OR student_email='$email' OR student_id='$id' LIMIT 1";
+        $_SESSION['student_id'] = $id;  
     } elseif ($role === 'advisor') {
         $check_query = "SELECT * FROM advisor WHERE advisor_username='$username' OR advisor_email='$email' OR advisor_id='$id' LIMIT 1";
     } elseif ($role === 'coordinator') {
@@ -123,8 +124,10 @@ if (isset($_POST['login_user'])) {
         $result_coordinator = mysqli_query($db, $query_coordinator);
 
         if (mysqli_num_rows($result_student) == 1) {
+            $user = mysqli_fetch_assoc($result_student);
             $_SESSION['username'] = $username;
             $_SESSION['email'] = $user['email'];
+            $_SESSION['student_id'] = $user['student_id'];
             $_SESSION['role'] = 'student';
             $_SESSION['success'] = "You are now logged in as Student";
             header('location: studentpage.php');
