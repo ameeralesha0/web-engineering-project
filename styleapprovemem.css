@@ -6,39 +6,58 @@ body {
     padding: 0;
 }
 
+/* Sidebar container */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 200px;
+    width: 200px; /* Ensure same width */
     height: 100vh;
     background-color: #c6dbef;
-    padding: 20px;
+    padding-top: 20px;
     box-sizing: border-box;
-    overflow-y: auto;
 }
 
-.sidebar button,
-.sidebar img,
-.sidebar a {
+/* Sidebar logo */
+.sidebar img {
     display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
+    margin: 0 auto 20px;
+    width: 100px;
 }
 
-.sidebar .blue-btn {
+/* Sidebar button styles */
+.sidebar button,
+.sidebar a {
+    width: 160px;  /* Button width */
+    margin: 10px auto;
+    padding: 10px;
+    display: block;
+    font-size: 14px;
     background-color: #0275d8;
     color: white;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
 }
-.sidebar .blue-btn:hover {
-    background-color: #0056b3;
+
+/* Sidebar button hover effect */
+.sidebar button:hover,
+.sidebar a:hover {
+    background-color: #025aa5;
 }
+
+/* Logout button */
+.sidebar .logout {
+    background-color: #d9534f;
+    margin-top: 20px;
+}
+
+.sidebar .logout:hover {
+    background-color: #c9302c;
+}
+
 
 .logout {
     background-color: #d9534f;
