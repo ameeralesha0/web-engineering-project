@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmtUpdate->close();
         } else {
             // Insert new membership record
-            $insertQuery = "INSERT INTO membership (student_id, upload_card, status, membership_name) VALUES (?, ?, 'pending', 'Your Club Name')";
+            $insertQuery = "INSERT INTO membership (student_id, upload_card, status) VALUES (?, ?, 'pending')";
             $stmtInsert = $db->prepare($insertQuery);
             $stmtInsert->bind_param("ss", $student_id, $fileName);
             $stmtInsert->execute();
@@ -109,7 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Show membership details
             echo "<h2>Your Membership Details</h2>";
             echo "Membership ID: " . htmlspecialchars($membership['membership_id']) . "<br>";
-            echo "Name: " . htmlspecialchars($membership['membership_name']) . "<br>";
             echo "Status: " . htmlspecialchars($membership['status']) . "<br>";
             echo "<img src='uploads/" . htmlspecialchars($membership['upload_card']) . "' alt='Membership Card' width='200'>";
         } elseif ($membership['status'] === 'rejected') {
