@@ -8,16 +8,11 @@ body {
 
 .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
     width: 200px;
     height: 100vh;
     background-color: #c6dbef;
     padding: 20px;
-    box-sizing: border-box;
-    overflow-y: auto; /* Optional: adds scrollbar inside sidebar if content is tall */
 }
-
 
 .sidebar button, .sidebar img {
     display: block;
