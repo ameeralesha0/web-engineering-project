@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $uploadMessage = "<p class='error'>❌ No file uploaded or upload error.</p>";
     }
 }
-    $student_id = $_SESSION['username'];
+    $student_id = $_SESSION['student_id'];
 
     $query = "SELECT * FROM membership WHERE student_id = ?";
     $stmt = $db->prepare($query);
