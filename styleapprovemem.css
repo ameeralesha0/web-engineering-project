@@ -60,7 +60,6 @@ body {
 .top-bar .title {
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 20px;
     flex-grow: 1;
     padding: 40px;
 }
@@ -72,6 +71,7 @@ body {
     background-color: #f9f9f9;
     max-width: 700px;
     margin-left: 40px;
+    margin-bottom: 20px;
 }
 
 .application img {
@@ -80,7 +80,7 @@ body {
     border: 1px solid #aaa;
     border-radius: 5px;
     margin-top: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px; 
 }
 
 .application label {
