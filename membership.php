@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($resultLastID->num_rows > 0) {
                     $lastID = $resultLastID->fetch_assoc()['membership_id'];
                     $number = intval(substr($lastID, 2)) + 1;
-                    $newID = 'MB' . str_pad($number, 3, '0', STR_PAD_LEFT);
+                    $newID = 'M' . str_pad($number, 3, '0', STR_PAD_LEFT);
                 } else {
-                    $newID = 'MB001'; // First ID
+                    $newID = 'M001'; // First ID
                 }
                 // Insert new membership record
                 $insertQuery = "INSERT INTO membership (membership_id, student_id, upload_card, status) VALUES (?, ?, ?, 'pending')";
