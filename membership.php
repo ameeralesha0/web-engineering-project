@@ -9,83 +9,83 @@ if (!isset($_SESSION['username'])) {
 
 $uploadMessage = "";
 
+// Get student_id from username in session
+$username = $_SESSION['username'];
+$studentQuery = $db->prepare("SELECT student_id FROM student WHERE student_username = ?");
+$studentQuery->bind_param("s", $username);
+$studentQuery->execute();
+$studentResult = $studentQuery->get_result();
+
+if ($studentResult->num_rows === 0) {
+    die("❌ Error: Username '$username' not found in the student table.");
+}
+
+$student_id = $studentResult->fetch_assoc()['student_id'];
+$studentQuery->close();
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $student_card = $_FILES['student_card'] ?? null;
 
     // Handle file upload only
     if ($student_card && $student_card['error'] === UPLOAD_ERR_OK) {
-    $uploadDirectory = 'uploads/';
-    $fileName = basename($student_card['name']);
-    $destinationPath = $uploadDirectory . $fileName;
+        $uploadDirectory = 'uploads/';
+        $fileName = basename($student_card['name']);
+        $destinationPath = $uploadDirectory . $fileName;
 
-    if (move_uploaded_file($student_card['tmp_name'], $destinationPath)) {
-        // Update or insert membership record with the uploaded card and set status to 'pending'
-        $student_id = $_SESSION['username'];
+        if (move_uploaded_file($student_card['tmp_name'], $destinationPath)) {
+            // Check if membership already exists
+            $checkQuery = "SELECT membership_id FROM membership WHERE student_id = ?";
+            $stmtCheck = $db->prepare($checkQuery);
+            $stmtCheck->bind_param("s", $student_id);
+            $stmtCheck->execute();
+            $resultCheck = $stmtCheck->get_result();
 
-        // Check if student exists
-        $checkStudent = $db->prepare("SELECT student_id FROM student WHERE student_id = ?");
-        $checkStudent->bind_param("s", $student_id);
-        $checkStudent->execute();
-        $resultStudent = $checkStudent->get_result();
+            if ($resultCheck->num_rows > 0) {
+                // Update existing record
+                $row = $resultCheck->fetch_assoc();
+                $membership_id = $row['membership_id'];
 
-        if ($resultStudent->num_rows === 0) {
-        die("❌ Error: Student ID '$student_id' not found in the student table. Please make sure the student is registered.");
-        }
-        $checkStudent->close();
-
-        // Check if membership already exists
-        $checkQuery = "SELECT membership_id FROM membership WHERE student_id = ?";
-        $stmtCheck = $db->prepare($checkQuery);
-        $stmtCheck->bind_param("s", $student_id);
-        $stmtCheck->execute();
-        $resultCheck = $stmtCheck->get_result();
-
-        if ($resultCheck->num_rows > 0) {
-            // Update existing record
-            $row = $resultCheck->fetch_assoc();
-            $membership_id = $row['membership_id'];
-
-            $updateQuery = "UPDATE membership SET upload_card = ?, status = 'pending' WHERE membership_id = ?";
-            $stmtUpdate = $db->prepare($updateQuery);
-            $stmtUpdate->bind_param("ss", $fileName, $membership_id);
-            $stmtUpdate->execute();
-            $stmtUpdate->close();
-        } else {
-            // Generate new membership_id
-            $resultLastID = $db->query("SELECT membership_id FROM membership ORDER BY membership_id DESC LIMIT 1");
-            if ($resultLastID->num_rows > 0) {
-                $lastID = $resultLastID->fetch_assoc()['membership_id'];
-                $number = intval(substr($lastID, 2)) + 1;
-                $newID = 'MB' . str_pad($number, 3, '0', STR_PAD_LEFT);
+                $updateQuery = "UPDATE membership SET upload_card = ?, status = 'pending' WHERE membership_id = ?";
+                $stmtUpdate = $db->prepare($updateQuery);
+                $stmtUpdate->bind_param("ss", $fileName, $membership_id);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
             } else {
-            $newID = 'MB001'; // First ID
+                // Generate new membership_id
+                $resultLastID = $db->query("SELECT membership_id FROM membership ORDER BY membership_id DESC LIMIT 1");
+                if ($resultLastID->num_rows > 0) {
+                    $lastID = $resultLastID->fetch_assoc()['membership_id'];
+                    $number = intval(substr($lastID, 2)) + 1;
+                    $newID = 'MB' . str_pad($number, 3, '0', STR_PAD_LEFT);
+                } else {
+                    $newID = 'MB001'; // First ID
+                }
+                // Insert new membership record
+                $insertQuery = "INSERT INTO membership (membership_id, student_id, upload_card, status) VALUES (?, ?, ?, 'pending')";
+                $stmtInsert = $db->prepare($insertQuery);
+                $stmtInsert->bind_param("sss", $newID, $student_id, $fileName);
+                $stmtInsert->execute();
+                $stmtInsert->close();
             }
-        // Insert new membership record
-        $insertQuery = "INSERT INTO membership (membership_id, student_id, upload_card, status) VALUES (?, ?, ?, 'pending')";
-        $stmtInsert = $db->prepare($insertQuery);
-        $stmtInsert->bind_param("sss", $newID, $student_id, $fileName);
-        $stmtInsert->execute();
-        $stmtInsert->close();
-        }
-        $stmtCheck->close();
+            $stmtCheck->close();
 
-        $uploadMessage = "<p class='success'>✅ Your student card has been uploaded successfully.<br>Please wait while we verify your registration.</p>";
+            $uploadMessage = "<p class='success'>✅ Your student card has been uploaded successfully.<br>Please wait while we verify your registration.</p>";
+        } else {
+            $uploadMessage = "<p class='error'>❌ Upload failed. Please try again or check the file format and size.</p>";
+        }
     } else {
-        $uploadMessage = "<p class='error'>❌ Upload failed. Please try again or check the file format and size.</p>";
-    }
-    } else {
-    $uploadMessage = "<p class='error'>❌ No file uploaded or upload error.</p>";
+        $uploadMessage = "<p class='error'>❌ No file uploaded or upload error.</p>";
     }
 }
-    $student_id = $_SESSION['student_id'];
 
-    $query = "SELECT * FROM membership WHERE student_id = ?";
-    $stmt = $db->prepare($query);
-    $stmt->bind_param("s", $student_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $membership = $result->fetch_assoc();
-    $stmt->close();
+// Get current membership details
+$query = "SELECT * FROM membership WHERE student_id = ?";
+$stmt = $db->prepare($query);
+$stmt->bind_param("s", $student_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$membership = $result->fetch_assoc();
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -104,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php if (!empty($uploadMessage)) echo $uploadMessage; ?>
 
         <form method="post" enctype="multipart/form-data">
-            <!-- Since user is logged in, no need to ask username, email, password here -->
             <label>Upload Student Card:</label><br>
             <input type="file" name="student_card" required><br><br>
             <button type="submit">Apply</button>
@@ -112,36 +111,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
 
         <?php 
-        // Your membership display logic here
         if ($membership) {
-        if ($membership['status'] === 'approved') {
-        // Show membership details
-            echo "<h2>Your Membership Details</h2>";
-            echo "Membership ID: " . htmlspecialchars($membership['membership_id']) . "<br>";
-            echo "Status: " . htmlspecialchars($membership['status']) . "<br>";
-            echo "<img src='uploads/" . htmlspecialchars($membership['upload_card']) . "' alt='Membership Card' width='200'>";
-        } elseif ($membership['status'] === 'rejected') {
-            // Show rejection message + reupload form
-            echo "<h2>Your membership application was rejected. Please reupload your membership card.</h2>";
+            if ($membership['status'] === 'approved') {
+                echo "<h2>Your Membership Details</h2>";
+                echo "Membership ID: " . htmlspecialchars($membership['membership_id']) . "<br>";
+                echo "Status: " . htmlspecialchars($membership['status']) . "<br>";
+                echo "<img src='uploads/" . htmlspecialchars($membership['upload_card']) . "' alt='Membership Card' width='200'>";
+            } elseif ($membership['status'] === 'rejected') {
+                echo "<h2>Your membership application was rejected. Please reupload your membership card.</h2>";
 
-        if (isset($_SESSION['upload_error'])) {
-            echo "<p style='color:red'>" . $_SESSION['upload_error'] . "</p>";
-            unset($_SESSION['upload_error']);
-        }
+                if (isset($_SESSION['upload_error'])) {
+                    echo "<p style='color:red'>" . $_SESSION['upload_error'] . "</p>";
+                    unset($_SESSION['upload_error']);
+                }
 
-        echo '<form action="upload_membership_card.php" method="post" enctype="multipart/form-data">';
-        echo '<input type="file" name="membership_card" required>';
-        echo '<button type="submit">Upload Card</button>';
-        echo '</form>';
+                echo '<form action="upload_membership_card.php" method="post" enctype="multipart/form-data">';
+                echo '<input type="file" name="membership_card" required>';
+                echo '<button type="submit">Upload Card</button>';
+                echo '</form>';
+            } else {
+                echo "<h2>Your membership application is still pending approval.</h2>";
+            }
         } else {
-            // Pending or other statuses
-            echo "<h2>Your membership application is still pending approval.</h2>";
-        }
-        } 
-        else {
             echo "<p>You have not applied for membership yet.</p>";
         }
-    ?>
+        ?>
     </div>
 </body>
 </html>
