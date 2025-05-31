@@ -1,5 +1,8 @@
 <?php
-include('server.php'); // assumes $db is your mysqli connection
+include('server.php'); 
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 
 if (!isset($_SESSION['username']) || !isset($_SESSION['role'])) {
     $_SESSION['msg'] = "You must log in first";
