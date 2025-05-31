@@ -118,6 +118,9 @@ $stmt->close();
                 echo "Membership ID: " . htmlspecialchars($membership['membership_id']) . "<br>";
                 echo "Status: " . htmlspecialchars($membership['status']) . "<br>";
                 echo "<img src='uploads/" . htmlspecialchars($membership['upload_card']) . "' alt='Membership Card' width='200'>";
+                echo "<div style='text-align: center;'>";
+                echo "<a href='profile.php'><button type='button'>Back</button></a>";
+                echo "</div>";
             } elseif ($membership['status'] === 'rejected') {
                 echo "<h2>Your membership application was rejected. Please reupload your membership card.</h2>";
 
@@ -137,7 +140,6 @@ $stmt->close();
             echo "<p>You have not applied for membership yet.</p>";
         }
         ?>
-        <a href="profile.php"><button type="button">Back</button></a>
     </div>
 </body>
 </html>
