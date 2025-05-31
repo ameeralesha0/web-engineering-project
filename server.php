@@ -129,21 +129,18 @@ if (isset($_POST['login_user'])) {
             $_SESSION['email'] = $user['email'];
             $_SESSION['student_id'] = $user['student_id'];
             $_SESSION['role'] = 'student';
-            $_SESSION['success'] = "You are now logged in as Student";
             header('location: studentpage.php');
         } elseif (mysqli_num_rows($result_advisor) == 1) {
             $user = mysqli_fetch_assoc($result_advisor);
             $_SESSION['username'] = $username;
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = 'advisor';
-            $_SESSION['success'] = "You are now logged in as Advisor";
             header('location: advisorpage.php');
         } elseif (mysqli_num_rows($result_coordinator) == 1) {
             $user = mysqli_fetch_assoc($result_coordinator);
             $_SESSION['username'] = $username;
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = 'coordinator';
-            $_SESSION['success'] = "You are now logged in as Coordinator";
             header('location: coordinatorpage.php');
         } else {
             array_push($errors, "Wrong username/password combination");
