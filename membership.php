@@ -108,9 +108,9 @@ $stmt->close();
             <label>Upload Student Card:</label><br>
             <input type="file" name="student_card" required><br><br>
             <button type="submit">Apply</button>
-            <a href="profile.php"><button type="button">Back</button></a>
             </form>
         <?php endif; ?>
+        <a href="profile.php"><button type="button">Back</button></a>
 
         <?php 
         if ($membership) {
