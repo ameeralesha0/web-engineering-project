@@ -1,5 +1,8 @@
 <?php
 session_start();
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 
 // Redirect if not logged in or not a student
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
