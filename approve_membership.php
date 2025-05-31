@@ -86,12 +86,14 @@ if ($result) {
     </div>
 
     <?php if (isset($_SESSION['success'])): ?>
-        <p class="success"><?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></p>
+    <div class="message-container">
+        <p class="success"><?= htmlspecialchars($_SESSION['success']); ?></p>
+    <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
     <?php if (isset($_SESSION['error'])): ?>
         <p class="error"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></p>
     <?php endif; ?>
-
+    </div>
     <?php if (count($membershipApplications) === 0): ?>
         <p>No membership applications pending approval.</p>
     <?php else: ?>
