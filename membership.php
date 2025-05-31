@@ -64,6 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['student_card'])) {
             }
             $check->close();
             $uploadMessage = "<p class='success'>✅ Upload successful. Application is now pending.</p>";
+            $_SESSION['just_uploaded'] = true;
+
         } else {
             $uploadMessage = "<p class='error'>❌ Upload failed. Please try again.</p>";
         }
@@ -100,24 +102,28 @@ $fetch->close();
                 <button type="submit">Apply</button>
             </form>
         <?php else: ?>
-            <div>
-                <strong>Membership ID:</strong> <?= htmlspecialchars($membership['membership_id']) ?><br>
-                <strong>Status:</strong> <?= htmlspecialchars($membership['status']) ?><br><br>
-                <img src="uploads/<?= htmlspecialchars($membership['upload_card']) ?>" width="200" alt="Uploaded Card"><br><br>
+    <?php if (!empty($_SESSION['just_uploaded'])): ?>
+        <div>
+            <strong>Membership ID:</strong> <?= htmlspecialchars($membership['membership_id']) ?><br>
+            <strong>Status:</strong> <?= htmlspecialchars($membership['status']) ?><br><br>
+            <img src="uploads/<?= htmlspecialchars($membership['upload_card']) ?>" width="200" alt="Uploaded Card"><br><br>
 
-                <?php if ($membership['status'] === 'rejected'): ?>
-                    <p class="error">❌ Your membership was rejected. Please re-upload your card.</p>
-                    <form method="post" enctype="multipart/form-data">
-                        <input type="file" name="student_card" required>
-                        <button type="submit">Re-upload</button>
-                    </form>
-                <?php elseif ($membership['status'] === 'pending'): ?>
-                    <p class="info">⏳ Your membership is currently under review.</p>
-                <?php elseif ($membership['status'] === 'approved'): ?>
-                    <p class="success">✅ Your membership has been approved.</p>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+            <?php if ($membership['status'] === 'rejected'): ?>
+                <p class="error">❌ Your membership was rejected. Please re-upload your card.</p>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="file" name="student_card" required>
+                    <button type="submit">Re-upload</button>
+                </form>
+            <?php elseif ($membership['status'] === 'pending'): ?>
+                <p class="info">⏳ Your membership is currently under review.</p>
+            <?php elseif ($membership['status'] === 'approved'): ?>
+                <p class="success">✅ Your membership has been approved.</p>
+            <?php endif; ?>
+        </div>
+        <?php unset($_SESSION['just_uploaded']); // Clear flag ?>
+    <?php endif; ?>
+<?php endif; ?>
+
 
         <div style="text-align: center; margin-top: 20px;">
             <a href="profile.php"><button type="button">Back to Profile</button></a>
