@@ -51,12 +51,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmtUpdate->execute();
             $stmtUpdate->close();
         } else {
-            // Insert new membership record
-            $insertQuery = "INSERT INTO membership (student_id, upload_card, status) VALUES (?, ?, 'pending')";
-            $stmtInsert = $db->prepare($insertQuery);
-            $stmtInsert->bind_param("ss", $student_id, $fileName);
-            $stmtInsert->execute();
-            $stmtInsert->close();
+            // Generate new membership_id
+            $resultLastID = $db->query("SELECT membership_id FROM membership ORDER BY membership_id DESC LIMIT 1");
+            if ($resultLastID->num_rows > 0) {
+                $lastID = $resultLastID->fetch_assoc()['membership_id'];
+                $number = intval(substr($lastID, 2)) + 1;
+                $newID = 'MB' . str_pad($number, 3, '0', STR_PAD_LEFT);
+            } else {
+            $newID = 'MB001'; // First ID
+            }
+        // Insert new membership record
+        $insertQuery = "INSERT INTO membership (membership_id, student_id, upload_card, status) VALUES (?, ?, ?, 'pending')";
+        $stmtInsert = $db->prepare($insertQuery);
+        $stmtInsert->bind_param("sss", $newID, $student_id, $fileName);
+        $stmtInsert->execute();
+        $stmtInsert->close();
         }
         $stmtCheck->close();
 
