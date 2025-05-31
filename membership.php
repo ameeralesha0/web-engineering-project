@@ -103,12 +103,14 @@ $stmt->close();
 
         <?php if (!empty($uploadMessage)) echo $uploadMessage; ?>
 
-        <form method="post" enctype="multipart/form-data">
+        <?php if (!$membership || empty($membership['upload_card'])): ?>
+            <form method="post" enctype="multipart/form-data">
             <label>Upload Student Card:</label><br>
             <input type="file" name="student_card" required><br><br>
             <button type="submit">Apply</button>
             <a href="profile.php"><button type="button">Back</button></a>
-        </form>
+            </form>
+        <?php endif; ?>
 
         <?php 
         if ($membership) {
