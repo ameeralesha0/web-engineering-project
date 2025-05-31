@@ -110,7 +110,6 @@ $stmt->close();
             <button type="submit">Apply</button>
             </form>
         <?php endif; ?>
-        <a href="profile.php"><button type="button">Back</button></a>
 
         <?php 
         if ($membership) {
@@ -138,6 +137,7 @@ $stmt->close();
             echo "<p>You have not applied for membership yet.</p>";
         }
         ?>
+        <a href="profile.php"><button type="button">Back</button></a>
     </div>
 </body>
 </html>
