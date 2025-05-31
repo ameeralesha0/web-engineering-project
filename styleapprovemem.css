@@ -33,7 +33,7 @@ body {
 /* Logout button */
 .sidebar .logout {
     background-color: #d9534f;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .sidebar .logout:hover {
