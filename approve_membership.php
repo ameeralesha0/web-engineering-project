@@ -14,12 +14,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_id'], $_PO
     $action = $_POST['action']; // 'approve' or 'reject'
 
     if ($action === 'approve' || $action === 'reject') {
-        // Use correct status values as in your DB enum
         $status = ($action === 'approve') ? 'approved' : 'rejected';
 
         $query = "UPDATE membership SET status = '$status' WHERE membership_id = '$membershipId'";
         if (mysqli_query($db, $query)) {
-            $_SESSION['success'] = "Membership ID $membershipId has been " . $status . ".";
+            if ($status === 'approved') {
+                $_SESSION['success'] = "Membership ID $membershipId has been approved.";
+            } else {
+                $_SESSION['error'] = "Membership ID $membershipId has been rejected.";
+            }
         } else {
             $_SESSION['error'] = "Error updating status: " . mysqli_error($db);
         }
@@ -91,12 +94,14 @@ if ($result) {
     </div>
     <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
+
     <?php if (isset($_SESSION['error'])): ?>
     <div class="message-container">
         <p class="error"><?= htmlspecialchars($_SESSION['error']); ?></p>
     </div>
     <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
+
     <?php if (count($membershipApplications) === 0): ?>
         <p>No membership applications pending approval.</p>
     <?php else: ?>
