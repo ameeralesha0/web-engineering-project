@@ -135,6 +135,9 @@ $stmt->close();
                 echo '</form>';
             } else {
                 echo "<h2>Your membership application is still pending approval.</h2>";
+                echo "<div style='text-align: center;'>";
+                echo "<a href='profile.php'><button type='button'>Back</button></a>";
+                echo "</div>";
             }
         } else {
             echo "<p>You have not applied for membership yet.</p>";
