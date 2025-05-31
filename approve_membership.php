@@ -88,12 +88,15 @@ if ($result) {
     <?php if (isset($_SESSION['success'])): ?>
     <div class="message-container">
         <p class="success"><?= htmlspecialchars($_SESSION['success']); ?></p>
+    </div>
     <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
     <?php if (isset($_SESSION['error'])): ?>
-        <p class="error"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></p>
-    <?php endif; ?>
+    <div class="message-container">
+        <p class="error"><?= htmlspecialchars($_SESSION['error']); ?></p>
     </div>
+    <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
     <?php if (count($membershipApplications) === 0): ?>
         <p>No membership applications pending approval.</p>
     <?php else: ?>
