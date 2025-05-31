@@ -100,7 +100,6 @@ if ($result) {
                 <strong>Membership ID:</strong> <?= htmlspecialchars($app['membership_id']) ?><br>
                 <strong>Student ID:</strong> <?= htmlspecialchars($app['student_id']) ?><br>
                 <strong>Student Name:</strong> <?= htmlspecialchars($app['student_name']) ?><br>
-                <strong>Club Name:</strong> <?= htmlspecialchars($app['membership_name']) ?><br>
                 <strong>Status:</strong> <?= htmlspecialchars($app['status']) ?><br>
 
                 <?php if (!empty($app['upload_card'])): ?>
