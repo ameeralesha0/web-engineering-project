@@ -1,5 +1,5 @@
 <?php
-include('server.php');
+include('db_connection.php');
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['token'], $_POST['password'])) {
