@@ -5,6 +5,9 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .login-container {
