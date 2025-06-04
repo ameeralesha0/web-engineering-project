@@ -1,47 +1,90 @@
-<?php 
-include('server.php'); 
+<?php
+// ✅ Use actual MySQL credentials
+$host = "localhost";
+$username = "webuser";
+$password = "admin1234"; // <-- use your real MySQL root password here
+$database = "mypetakom";
+$port = 4306;
+
+// ✅ Create DB connection
+$conn = new mysqli($host, $username, $password, $database, $port);
+
+// ✅ Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}else {
+    echo "Connected successfully!";
+}
+
+// ✅ Only process form if submitted
+if (isset($_POST['register'])) {
+    $student_id = $_POST['student_id'];
+    $student_name = $_POST['student_name'];
+    $student_course = $_POST['student_course'];
+    $student_username = $_POST['student_username'];
+    $student_email = $_POST['student_email'];
+    $student_pass = password_hash($_POST['student_pass'], PASSWORD_DEFAULT);
+
+    // ✅ Check if username already exists
+    $check = $conn->prepare("SELECT student_id FROM student WHERE student_username = ?");
+    $check->bind_param("s", $student_username);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows > 0) {
+        $error = "Username already exists.";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO student (student_id, student_name, student_course, student_username, student_pass, student_email)
+                                VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssss", $student_id, $student_name, $student_course, $student_username, $student_pass, $student_email);
+        if ($stmt->execute()) {
+            $success = "Registration successful. You can now <a href='login.php'>login</a>.";
+        } else {
+            $error = "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+    $check->close();
+}
 ?>
+
 
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Register - MyPetakom</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Student Registration</title>
+    <style>
+        body { font-family: Arial; margin: 50px auto; width: 400px; }
+        label, input { display: block; margin: 10px 0; }
+        input[type=submit] { margin-top: 20px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
 </head>
 <body>
-<div class="login-container">
-    <div class="form-side1">
-        <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
-        <h2>Register a New Account</h2>
-        <form method="post" action="register.php">
-            <?php include('errors.php'); ?>
+    <h2>Student Registration</h2>
+    <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+    <?php if (isset($success)) echo "<p class='success'>$success</p>"; ?>
+    <form method="post">
+        <label>Student ID</label>
+        <input type="text" name="student_id" required>
 
-            <input type="text" name="name" placeholder="Full Name" required>
-            <input type="text" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" placeholder="Username" required>
-            <input type="email" name="email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" placeholder="Email" required>
-            <input type="text" name="id" placeholder="ID" required>
+        <label>Student Name</label>
+        <input type="text" name="student_name" required>
 
-            <select name="role" required>
-                <option value="">Select Role</option>
-                <option value="student">Student</option>
-                <option value="advisor">Event Advisor</option>
-                <option value="coordinator">Petakom Coordinator</option>
-            </select>
+        <label>Course</label>
+        <input type="text" name="student_course" required>
 
-            <input type="password" name="password" placeholder="Password" required>
+        <label>Username</label>
+        <input type="text" name="student_username" required>
 
-            <button type="submit" class="btn" name="reg_user">Register</button>
-        </form>
-        <div class="links">
-            <a href="login.php">Already have an account? Login</a>
-        </div>
-    </div>
+        <label>Password</label>
+        <input type="password" name="student_pass" required>
 
-    <div class="title-side">
-        <h1>WELCOME</h1>
-        <p>Join the PETAKOM community today!</p>
-    </div>
-</div>
+        <label>Email</label>
+        <input type="email" name="student_email" required>
+
+        <input type="submit" name="register" value="Register">
+    </form>
 </body>
 </html>

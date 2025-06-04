@@ -1,223 +1,294 @@
 <?php
 session_start();
+$host = "localhost";
+$username = "webuser";
+$password = "admin1234"; // your actual password if any
+$database = "mypetakom"; // correct database name
+$port = 4306;
 
-// Redirect if not logged in or not a student
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+$conn = new mysqli($host, $username, $password, $database, $port);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Check if student logged in
+if (!isset($_SESSION['student_id'])) {
     header("Location: login.php");
     exit();
 }
+$student_id = $_SESSION['student_id'];
 
-require_once 'config/db.php'; // Include the PDO database connection file
+// Handle file upload helper
+function uploadFile($file) {
+    $targetDir = "uploads/";
+    $fileName = basename($file["name"]);
+    $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-$studentID = $_SESSION['user_id'];
-$statusMessage = "";
-
-// Handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $claimID = uniqid('CLAIM_'); // Generate a unique claim ID
-    $eventID = $_POST['event_id'] ?? '';
-    $eventName = $_POST['event_name'] ?? '';
-    $eventLevel = $_POST['event_level'] ?? '';
-    $position = $_POST['position'] ?? '';
-    $date = $_POST['date'] ?? '';
-    // Handle file upload
-    $uploadStatus = 'No file uploaded';
-    $filePath = null;
-
-    if (isset($_FILES['upload_document']) && $_FILES['upload_document']['error'] == UPLOAD_ERR_OK) {
-        $uploadDir = 'uploads/merit_claims/'; // Ensure this directory exists and is writable
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-        $fileName = basename($_FILES['upload_document']['name']);
-        $filePath = $uploadDir . $fileName;
-        if (move_uploaded_file($_FILES['upload_document']['tmp_name'], $filePath)) {
-            $uploadStatus = 'File uploaded successfully.';
-        } else {
-            $uploadStatus = 'Failed to upload file.';
-            error_log("Failed to move uploaded file: " . $_FILES['upload_document']['tmp_name'] . " to " . $filePath);
-        }
+    // Allow only pdf/doc/docx files
+    $allowedTypes = ['pdf', 'doc', 'docx'];
+    if (!in_array($fileType, $allowedTypes)) {
+        return false;
+    }
+    
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return false;
     }
 
-    try {
-        $stmt = $pdo->prepare("INSERT INTO merit_claims (claim_id, student_id, event_id, event_name, event_level, position, event_date, document_path, status) VALUES (:claim_id, :student_id, :event_id, :event_name, :event_level, :position, :event_date, :document_path, 'Pending')");
+    $targetFilePath = $targetDir . uniqid() . "_" . $fileName;
 
-        $stmt->execute([
-            ':claim_id' => $claimID,
-            ':student_id' => $studentID,
-            ':event_id' => $eventID,
-            ':event_name' => $eventName,
-            ':event_level' => $eventLevel,
-            ':position' => $position,
-            ':event_date' => $date,
-            ':document_path' => $filePath
-        ]);
-
-        $statusMessage = "Claim submitted successfully! Status: Pending. " . $uploadStatus;
-
-    } catch (PDOException $e) {
-        error_log("Error submitting merit claim: " . $e->getMessage());
-        $statusMessage = "Error submitting claim: " . $e->getMessage();
+    if (move_uploaded_file($file["tmp_name"], $targetFilePath)) {
+        return $targetFilePath;
+    } else {
+        return false;
     }
 }
+
+
+// Handle Add Claim
+if (isset($_POST['add_claim'])) {
+    $event_id = $_POST['event_id'];
+    $event_name = $_POST['event_name'];
+    $event_level = $_POST['event_level'];
+    $position = $_POST['position'];
+    $claim_date = date('Y-m-d');
+    
+    if ($_FILES['support_doc']['name']) {
+        $uploadPath = uploadFile($_FILES['support_doc']);
+        if (!$uploadPath) {
+            $error = "Invalid file type or upload error. Allowed: pdf, doc, docx.";
+        }
+    } else {
+        $uploadPath = null;
+    }
+
+    if (!isset($error)) {
+        // Generate unique claim_id
+        $claim_id = 'C' . str_pad(rand(1,9999), 4, '0', STR_PAD_LEFT);
+        
+        $stmt = $conn->prepare("INSERT INTO merit_claim (claim_id, student_id, event_id, event_name, event_level, position, support_doc, claim_status, claim_date)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)");
+        $stmt->bind_param("ssssssss", $claim_id, $student_id, $event_id, $event_name, $event_level, $position, $uploadPath, $claim_date);
+        $stmt->execute();
+        $stmt->close();
+        header("Location: claim_merit.php");
+        exit();
+    }
+}
+
+// Handle Update Claim
+if (isset($_POST['update_claim'])) {
+    $claim_id = $_POST['claim_id'];
+    $event_name = $_POST['event_name'];
+    $event_level = $_POST['event_level'];
+    $position = $_POST['position'];
+    
+    // Check if claim is still PENDING
+    $stmt = $conn->prepare("SELECT claim_status, support_doc FROM merit_claim WHERE claim_id = ? AND student_id = ?");
+    $stmt->bind_param("ss", $claim_id, $student_id);
+    $stmt->execute();
+    $stmt->bind_result($claim_status, $old_doc);
+    $stmt->fetch();
+    $stmt->close();
+    
+    if ($claim_status === 'PENDING') {
+        // Handle file upload if new file given
+        if ($_FILES['support_doc']['name']) {
+            $uploadPath = uploadFile($_FILES['support_doc']);
+            if (!$uploadPath) {
+                $error = "Invalid file type or upload error. Allowed: pdf, doc, docx.";
+            }
+        } else {
+            $uploadPath = $old_doc;
+        }
+
+        if (!isset($error)) {
+            $stmt = $conn->prepare("UPDATE merit_claim SET event_name=?, event_level=?, position=?, support_doc=? WHERE claim_id=? AND student_id=?");
+            $stmt->bind_param("ssssss", $event_name, $event_level, $position, $uploadPath, $claim_id, $student_id);
+            $stmt->execute();
+            $stmt->close();
+            header("Location: claim_merit.php");
+            exit();
+        }
+    } else {
+        $error = "Cannot update claim that is already submitted or processed.";
+    }
+}
+
+// Handle Delete Claim
+if (isset($_GET['delete']) && $_GET['delete'] != '') {
+    $claim_id = $_GET['delete'];
+    // Only delete if PENDING
+    $stmt = $conn->prepare("SELECT claim_status FROM merit_claim WHERE claim_id = ? AND student_id = ?");
+    $stmt->bind_param("ss", $claim_id, $student_id);
+    $stmt->execute();
+    $stmt->bind_result($claim_status);
+    $stmt->fetch();
+    $stmt->close();
+    
+    if ($claim_status === 'PENDING') {
+        $stmt = $conn->prepare("DELETE FROM merit_claim WHERE claim_id = ? AND student_id = ?");
+        $stmt->bind_param("ss", $claim_id, $student_id);
+        $stmt->execute();
+        $stmt->close();
+        header("Location: claim_merit.php");
+        exit();
+    } else {
+        $error = "Cannot delete claim that is already submitted or processed.";
+    }
+}
+
+// Fetch all claims for logged in student
+$result = $conn->query("SELECT * FROM merit_claim WHERE student_id = '$student_id' ORDER BY claim_date DESC");
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Merit - MyPetakom</title>
-    <link rel="stylesheet" href="stylepage.css">
-    <style>
-        /* Specific styles for claim_merit.php */
-        .claim-form-container {
-            padding: 20px;
-            max-width: 600px;
-            margin: 20px auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .claim-form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        .claim-form input[type="text"],
-        .claim-form input[type="date"],
-        .claim-form select {
-            width: calc(100% - 22px); /* Adjust for padding and border */
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        .claim-form input[type="file"] {
-            margin-bottom: 15px;
-        }
-        .form-actions {
-            display: flex;
-            justify-content: center; /* Center the buttons */
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap; /* Allow buttons to wrap */
-        }
-        .form-actions button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-            min-width: 120px; /* Ensure buttons have a minimum width */
-        }
-        .form-actions .save-draft-btn {
-            background-color: #ffc107; /* Warning yellow */
-            color: #333;
-        }
-        .form-actions .save-draft-btn:hover {
-            background-color: #e0a800;
-        }
-        .form-actions .submit-claim-btn {
-            background-color: #28a745; /* Success green */
-            color: white;
-        }
-        .form-actions .submit-claim-btn:hover {
-            background-color: #218838;
-        }
-        .form-actions .delete-btn {
-            background-color: #dc3545; /* Danger red */
-            color: white;
-        }
-        .form-actions .delete-btn:hover {
-            background-color: #c82333;
-        }
-        .form-actions .back-btn {
-            background-color: #6c757d; /* Secondary gray */
-            color: white;
-        }
-        .form-actions .back-btn:hover {
-            background-color: #5a6268;
-        }
-        .status-message {
-            text-align: center;
-            margin-top: 20px;
-            font-weight: bold;
-            color: green; /* Default to green for success */
-        }
-        .status-message.error {
-            color: red; /* Red for errors */
-        }
-        .claim-history-link {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.95em;
-        }
-    </style>
+    <link rel="stylesheet" href="claimmerit.css">
+
 </head>
-<body>
-    <header>
-        <img src="images/mypetakom_logo.png" alt="MyPetakom Logo" class="logo">
+<header>
+        <img src="petakom.jpg" alt="MyPetakom Logo" class="logo">
         <h1>Claim Merit</h1>
         <a href="logout.php" class="logout-btn">Logout</a>
     </header>
+<body>
+    
+    
+    <?php if (isset($error)) echo '<p class="error">'.$error.'</p>'; ?>
+    
+    <!-- Add / Update form -->
+    <?php 
+    // If update mode?
+    if (isset($_GET['edit'])) {
+        $edit_id = $_GET['edit'];
+        $stmt = $conn->prepare("SELECT * FROM merit_claim WHERE claim_id = ? AND student_id = ?");
+        $stmt->bind_param("ss", $edit_id, $student_id);
+        $stmt->execute();
+        $claim = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if ($claim['claim_status'] !== 'PENDING') {
+            echo "<p>You cannot edit a claim that is not pending.</p>";
+        } else {
+    ?>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="claim_id" value="<?= htmlspecialchars($claim['claim_id']) ?>">
+        <label>Event Name</label>
+        <input type="text" name="event_name" required value="<?= htmlspecialchars($claim['event_name']) ?>">
+        
+        <label>Event Level</label>
+        <select name="event_level" required>
+            <?php
+            $levels = ['International', 'National', 'State', 'District', 'UMPSA'];
+            foreach ($levels as $level) {
+                $selected = ($claim['event_level'] == $level) ? "selected" : "";
+                echo "<option value=\"$level\" $selected>$level</option>";
+            }
+            ?>
+        </select>
 
-    <main class="claim-form-container">
-        <?php if (!empty($statusMessage)): ?>
-            <p class="status-message <?php echo strpos($statusMessage, 'Error') !== false ? 'error' : ''; ?>"><?php echo htmlspecialchars($statusMessage); ?></p>
-        <?php endif; ?>
+        <label>Position</label>
+        <select name="position" required>
+            <?php
+            $positions = ['Main', 'Committee', 'Participant'];
+            foreach ($positions as $pos) {
+                $selected = ($claim['position'] == $pos) ? "selected" : "";
+                echo "<option value=\"$pos\" $selected>$pos</option>";
+            }
+            ?>
+        </select>
 
-        <form class="claim-form" action="claim_merit.php" method="POST" enctype="multipart/form-data">
-            <label for="claim_id">Claim ID:</label>
-            <input type="text" id="claim_id" name="claim_id" value="Automatically Generated" disabled>
+        <label>Supporting Document (PDF/DOC/DOCX)</label>
+        <input type="file" name="support_doc" accept=".pdf,.doc,.docx">
+        <small>Leave empty to keep existing document.</small><br>
 
-            <label for="student_id">Student ID:</label>
-            <input type="text" id="student_id" name="student_id" value="<?php echo htmlspecialchars($studentID); ?>" disabled>
+        <input type="submit" name="update_claim" value="Update Claim">
+        <a href="claim_merit.php"><button type="button">Cancel</button></a>
+    </form>
 
-            <label for="event_id">Event ID:</label>
-            <input type="text" id="event_id" name="event_id" required>
+    <?php
+        }
+    } else {
+    ?>
+    <!-- Add new claim -->
+    <form method="post" enctype="multipart/form-data">
+        <label>Event ID</label>
+        <input type="text" name="event_id" required placeholder="Enter event ID e.g. EVT001">
 
-            <label for="event_name">Event Name:</label>
-            <input type="text" id="event_name" name="event_name" required>
+        <label>Event Name</label>
+        <input type="text" name="event_name" required placeholder="Enter event name">
 
-            <label for="event_level">Event Level:</label>
-            <select id="event_level" name="event_level" required>
-                <option value="">Select Level</option>
-                <option value="University">University</option>
-                <option value="Faculty">Faculty</option>
-                <option value="Club">Club</option>
-                <option value="National">National</option>
-                <option value="International">International</option>
-            </select>
+        <label>Event Level</label>
+        <select name="event_level" required>
+            <option value="">Select level</option>
+            <option value="International">International</option>
+            <option value="National">National</option>
+            <option value="State">State</option>
+            <option value="District">District</option>
+            <option value="UMPSA">UMPSA</option>
+        </select>
 
-            <label for="position">Position:</label>
-            <select id="position" name="position" required>
-                <option value="">Select Position</option>
-                <option value="Participant">Participant</option>
-                <option value="Organizer">Organizer</option>
-                <option value="Volunteer">Volunteer</option>
-                <option value="Winner">Winner</option>
-            </select>
+        <label>Position</label>
+        <select name="position" required>
+            <option value="">Select position</option>
+            <option value="Main">Main</option>
+            <option value="Committee">Committee</option>
+            <option value="Participant">Participant</option>
+        </select>
 
-            <label for="date">Date:</label>
-            <input type="date" id="date" name="date" required>
+        <label>Supporting Document (PDF/DOC/DOCX)</label>
+        <input type="file" name="support_doc" accept=".pdf,.doc,.docx" required>
 
-            <label for="upload_document">Upload Document:</label>
-            <input type="file" id="upload_document" name="upload_document" accept=".pdf,.jpg,.jpeg,.png">
+        <input type="submit" name="add_claim" value="Submit Claim">
+        <a href="studentpage.php" class="button-link">Back</a>
 
-            <div class="form-actions">
-                <button type="button" class="save-draft-btn" onclick="alert('Save Draft functionality to be implemented.')">Save Draft</button>
-                <button type="submit" class="submit-claim-btn">Submit Claim</button>
-                <button type="button" class="delete-btn" onclick="alert('Delete functionality to be implemented.')">Delete</button>
-                <button type="button" class="back-btn" onclick="location.href='student_homepage.php'">Back</button>
-            </div>
-        </form>
+    </form>
+    <?php } ?>
 
-        <a href="claim_history.php" class="claim-history-link">View Claim History</a>
-    </main>
+    <h3>Your Claims</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Event ID</th>
+                <th>Event Name</th>
+                <th>Level</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Claim Date</th>
+                <th>Supporting Document</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while ($row = $result->fetch_assoc()) { ?>
+            <tr>
+                <td><?= htmlspecialchars($row['event_id']) ?></td>
+                <td><?= htmlspecialchars($row['event_name']) ?></td>
+                <td><?= htmlspecialchars($row['event_level']) ?></td>
+                <td><?= htmlspecialchars($row['position']) ?></td>
+                <td><?= htmlspecialchars($row['claim_status']) ?></td>
+                <td><?= htmlspecialchars($row['claim_date']) ?></td>
+                <td>
+                    <?php if ($row['support_doc']) { ?>
+                    <a href="<?= htmlspecialchars($row['support_doc']) ?>" target="_blank">View</a>
+                    <?php } else { echo "No file"; } ?>
+                </td>
+                <td>
+                    <?php if ($row['claim_status'] === 'PENDING') { ?>
+                        <a href="claim_merit.php?edit=<?= $row['claim_id'] ?>">Edit</a> |
+                        <a href="claim_merit.php?delete=<?= $row['claim_id'] ?>" onclick="return confirm('Delete this claim?')">Delete</a>
+                    <?php } else {
+                        echo "-";
+                    } ?>
+                </td>
+            </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+
 </body>
 </html>
