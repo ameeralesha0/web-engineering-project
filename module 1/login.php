@@ -1,9 +1,12 @@
 <?php 
+session_start();
 include('db_connection.php');
-// LOGIN USER
+$errors = [];
+
 if (isset($_POST['login_user'])) {
     $username = mysqli_real_escape_string($db, $_POST['username']);
-    $password = mysqli_real_escape_string($db, $_POST['password']);
+    $password = $_POST['password']; 
+    $role = $_POST['role'];
 
     if (empty($username)) {
         array_push($errors, "Username is required");
@@ -11,47 +14,59 @@ if (isset($_POST['login_user'])) {
     if (empty($password)) {
         array_push($errors, "Password is required");
     }
+    if (empty($role)) {
+        array_push($errors, "Role is required");
+    }
 
     if (count($errors) == 0) {
-        $password = md5($password); // Still using md5 as requested
-
-        // Check student table
-        $query_student = "SELECT * FROM student WHERE student_username='$username' AND student_pass='$password'";
-        $result_student = mysqli_query($db, $query_student);
-
-        // Check advisor table
-        $query_advisor = "SELECT * FROM advisor WHERE advisor_username='$username' AND advisor_pass='$password'";
-        $result_advisor = mysqli_query($db, $query_advisor);
-
-        // Check coordinator table
-        $query_coordinator = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' AND staff_pass='$password'";
-        $result_coordinator = mysqli_query($db, $query_coordinator);
-
-        if (mysqli_num_rows($result_student) == 1) {
-            $user = mysqli_fetch_assoc($result_student);
-            $_SESSION['username'] = $username;
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['student_id'] = $user['student_id'];
-            $_SESSION['role'] = 'student';
-            header('location: studentpage.php');
-        } elseif (mysqli_num_rows($result_advisor) == 1) {
-            $user = mysqli_fetch_assoc($result_advisor);
-            $_SESSION['username'] = $username;
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = 'advisor';
-            header('location: advisorpage.php');
-        } elseif (mysqli_num_rows($result_coordinator) == 1) {
-            $user = mysqli_fetch_assoc($result_coordinator);
-            $_SESSION['username'] = $username;
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = 'coordinator';
-            header('location: coordinatorpage.php');
-        } else {
-            array_push($errors, "Wrong username/password combination");
+        // Role-based login
+        if ($role === 'student') {
+            $query = "SELECT * FROM student WHERE student_username='$username' LIMIT 1";
+            $result = mysqli_query($db, $query);
+            if ($result && mysqli_num_rows($result) === 1) {
+                $user = mysqli_fetch_assoc($result);
+                if (password_verify($password, $user['student_pass'])) {
+                    $_SESSION['username'] = $username;
+                    $_SESSION['email'] = $user['student_email'];
+                    $_SESSION['student_id'] = $user['student_id'];
+                    $_SESSION['role'] = 'student';
+                    header('location: studentpage.php');
+                    exit;
+                }
+            }
+        } elseif ($role === 'advisor') {
+            $query = "SELECT * FROM advisor WHERE advisor_username='$username' LIMIT 1";
+            $result = mysqli_query($db, $query);
+            if ($result && mysqli_num_rows($result) === 1) {
+                $user = mysqli_fetch_assoc($result);
+                if (password_verify($password, $user['advisor_pass'])) {
+                    $_SESSION['username'] = $username;
+                    $_SESSION['email'] = $user['advisor_email'];
+                    $_SESSION['role'] = 'advisor';
+                    header('location: advisorpage.php');
+                    exit;
+                }
+            }
+        } elseif ($role === 'coordinator') {
+            $query = "SELECT * FROM petakom_coordinator WHERE staff_username='$username' LIMIT 1";
+            $result = mysqli_query($db, $query);
+            if ($result && mysqli_num_rows($result) === 1) {
+                $user = mysqli_fetch_assoc($result);
+                if (password_verify($password, $user['staff_pass'])) {
+                    $_SESSION['username'] = $username;
+                    $_SESSION['email'] = $user['staff_email'];
+                    $_SESSION['role'] = 'coordinator';
+                    header('location: coordinatorpage.php');
+                    exit;
+                }
+            }
         }
+
+        array_push($errors, "Wrong username/password combination.");
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
