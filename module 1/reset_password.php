@@ -1,38 +1,49 @@
 <?php
+require "vendor/autoload.php";
 include('db_connection.php');
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['token'], $_POST['password'])) {
+$token = $_GET['token'] ?? '';
+$errors = [];
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = mysqli_real_escape_string($db, $_POST['token']);
-    $newPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = mysqli_real_escape_string($db, $_POST['password']);
+    $confirm_password = mysqli_real_escape_string($db, $_POST['confirm_password']);
 
-    // Find token
-    $query = "SELECT * FROM password_resets WHERE token='$token' AND expires_at > NOW() LIMIT 1";
-    $result = mysqli_query($db, $query);
-    if ($result && mysqli_num_rows($result) > 0) {
-        $resetData = mysqli_fetch_assoc($result);
-        $email = $resetData['email'];
-
-        // Update password in user tables
-        $tables = ['student', 'advisor', 'petakom_coordinator'];
-        $updated = false;
-        foreach ($tables as $table) {
-            $update = "UPDATE $table SET password='$newPassword' WHERE email='$email'";
-            if (mysqli_query($db, $update) && mysqli_affected_rows($db) > 0) {
-                $updated = true;
-                break;
-            }
-        }
-
-        if ($updated) {
-            // Delete token after successful reset
-            mysqli_query($db, "DELETE FROM password_resets WHERE token='$token'");
-            $message = "Your password has been reset successfully. <a href='login.php'>Login here</a>";
-        } else {
-            $error = "Password reset failed. User not found.";
-        }
+    if ($password !== $confirm_password) {
+        $errors[] = "Passwords do not match.";
     } else {
-        $error = "Invalid or expired token.";
+        $check = "SELECT * FROM password_resets WHERE token = '$token' AND expires_at > NOW() LIMIT 1";
+        $result = mysqli_query($db, $check);
+        if ($result && mysqli_num_rows($result) > 0) {
+            $data = mysqli_fetch_assoc($result);
+            $email = $data['email'];
+
+            // Check which table the user belongs to
+            $tables = [
+                'student' => 'student_email',
+                'advisor' => 'advisor_email',
+                'petakom_coordinator' => 'staff_email'
+            ];
+
+            foreach ($tables as $table => $emailCol) {
+                $userQuery = "SELECT * FROM $table WHERE $emailCol = '$email' LIMIT 1";
+                $userResult = mysqli_query($db, $userQuery);
+                if ($userResult && mysqli_num_rows($userResult) > 0) {
+                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                    $update = "UPDATE $table SET password = '$hashedPassword' WHERE $emailCol = '$email'";
+                    mysqli_query($db, $update);
+
+                    // Delete the token
+                    mysqli_query($db, "DELETE FROM password_resets WHERE email = '$email'");
+                    $success = "Your password has been reset successfully.";
+                    break;
+                }
+            }
+        } else {
+            $errors[] = "Invalid or expired token.";
+        }
     }
 }
 ?>
@@ -49,17 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['token'], $_POST['passw
     <div class="form-side2">
         <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
         <h2>Reset Password</h2>
-        <?php if (isset($message)) echo "<p class='success'>$message</p>"; ?>
-        <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
-
-        <?php if (!isset($message)) : ?>
-            <form method="post">
-                <input type="hidden" name="token" value="<?php echo htmlspecialchars($_GET['token'] ?? $_POST['token'] ?? ''); ?>">
-                <input type="password" name="password" placeholder="Enter new password" required>
-                <button type="submit">Reset Password</button>
-            </form>
+        <?php foreach ($errors as $err) echo "<p class='error'>$err</p>"; ?>
+        <?php if ($success) echo "<p class='success'>$success</p>"; ?>
+        <?php if (!$success): ?>
+        <form method="post">
+            <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+            <input type="password" name="password" placeholder="New Password" required>
+            <input type="password" name="confirm_password" placeholder="Confirm New Password" required>
+            <button type="submit">Reset Password</button>
+        </form>
         <?php endif; ?>
-
         <div class="links">
             <a href="login.php">Back to Login</a>
         </div>
