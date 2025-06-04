@@ -72,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="login-container">
-    <div class="form-side2">
+<div class="reset-container">
+    <div class="form-side3">
         <img src="logo-petakom.png" alt="PETAKOM Logo" class="logo">
         <h2>Reset Password</h2>
         <?php foreach ($errors as $err) echo "<p class='error'>$err</p>"; ?>
