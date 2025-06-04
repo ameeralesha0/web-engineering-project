@@ -46,6 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Perform the update
             $update = "UPDATE $table SET $passwordCol = '$hashedPassword' WHERE $emailCol = '$email'";
             mysqli_query($db, $update);
+            if (!mysqli_query($db, $update)) {
+            echo "Update failed: " . mysqli_error($db);
+            }
 
             // Delete the token
             mysqli_query($db, "DELETE FROM password_resets WHERE email = '$email'");
