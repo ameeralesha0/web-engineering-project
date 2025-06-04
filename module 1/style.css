@@ -17,6 +17,16 @@ body {
     max-width: 400px;      
 }
 
+.reset-container {
+    display: flex;
+    height: 100vh;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;      
+}
+
 .title-side {
     flex: 1;
     color: rgb(255, 255, 255);
