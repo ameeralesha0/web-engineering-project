@@ -82,7 +82,8 @@ body {
 .form-side3 {
     flex: 1;
     background: rgb(255, 255, 255);
-    margin :auto;
+    margin-right: 700px;
+    margin-left: 700px;
     display: flex;
     flex-direction: column;
     border-style: hidden;
