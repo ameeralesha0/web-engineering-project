@@ -17,6 +17,14 @@ body {
     max-width: 400px;      
 }
 
+.reset-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+}
+
 
 .title-side {
     flex: 1;
@@ -77,6 +85,16 @@ body {
     justify-content: center;
     height:400px;
     padding: 40px;
+}
+
+.form-side3 {
+    background: #ffffff;
+    width: 100%;
+    max-width: 400px; /* Responsive width */
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .form-side h2 {
