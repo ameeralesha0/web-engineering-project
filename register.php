@@ -1,5 +1,5 @@
 <?php 
-include('server.php'); 
+include('db_connection.php');
 // REGISTER USER
 if (isset($_POST['reg_user'])) {
     // receive all input values from the form
