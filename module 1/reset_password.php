@@ -28,19 +28,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
 
             foreach ($tables as $table => $emailCol) {
-                $userQuery = "SELECT * FROM $table WHERE $emailCol = '$email' LIMIT 1";
-                $userResult = mysqli_query($db, $userQuery);
-                if ($userResult && mysqli_num_rows($userResult) > 0) {
-                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                    $update = "UPDATE $table SET password = '$hashedPassword' WHERE $emailCol = '$email'";
-                    mysqli_query($db, $update);
+            $userQuery = "SELECT * FROM $table WHERE $emailCol = '$email' LIMIT 1";
+            $userResult = mysqli_query($db, $userQuery);
+            if ($userResult && mysqli_num_rows($userResult) > 0) {
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-                    // Delete the token
-                    mysqli_query($db, "DELETE FROM password_resets WHERE email = '$email'");
-                    $success = "Your password has been reset successfully.";
-                    break;
+            // Determine correct password column name
+            $passwordCol = '';
+                if ($table === 'student') {
+                    $passwordCol = 'student_pass';
+                } elseif ($table === 'advisor') {
+                    $passwordCol = 'advisor_pass';
+                } elseif ($table === 'petakom_coordinator') {
+                    $passwordCol = 'staff_pass';
+                }
+
+            // Perform the update
+            $update = "UPDATE $table SET $passwordCol = '$hashedPassword' WHERE $emailCol = '$email'";
+            mysqli_query($db, $update);
+
+            // Delete the token
+            mysqli_query($db, "DELETE FROM password_resets WHERE email = '$email'");
+            $success = "Your password has been reset successfully.";
+            break;
                 }
             }
+
         } else {
             $errors[] = "Invalid or expired token.";
         }
