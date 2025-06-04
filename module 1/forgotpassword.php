@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         mysqli_query($db, $insert);
 
         // Prepare email
-        $resetLink = "http://yourdomain.com/reset_password.php?token=$token";
+        $resetLink = "http://localhost/reset_password.php?token=$token";
 
         $mail = new PHPMailer(true);
 
