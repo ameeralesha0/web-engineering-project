@@ -3,6 +3,7 @@ include('db_connection.php');
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
+
 // Redirect if not logged in
 if (!isset($_SESSION['username'])) {
     $_SESSION['msg'] = "You must log in first";
