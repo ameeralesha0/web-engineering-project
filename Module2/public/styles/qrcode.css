@@ -1,0 +1,94 @@
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+
+:root {
+    --primary-blue: #4A90E2;
+    --secondary-green: #50E3C2;
+    --accent-red: #FF5A5F;
+    --background-light: #F8F9FA;
+    --text-dark: #2C3E50;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+}
+
+/* Page Layout */
+body {
+    background: linear-gradient(120deg, #f6f9fc 0%, #e8f4f8 100%);
+    color: var(--text-dark);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.qr-container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+    border: 2px solid var(--primary-blue);
+}
+
+.qr-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-green) 100%);
+    color: white;
+    padding: 1.2rem;
+    border-radius: 13px 13px 0 0;
+    text-align: center;
+}
+
+.qr-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.qr-form select,
+.qr-form button {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--border-radius);
+}
+
+.qr-form select {
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.qr-form select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+}
+
+.btn-primary {
+    background-color: var(--secondary-green);
+    border-color: var(--secondary-green);
+    color: var(--text-dark);
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #3FC1AD;
+    border-color: #3FC1AD;
+}
+
+.btn-success {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: white;
+}
+
+.qr-preview {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.qr-preview img {
+    max-width: 300px;
+    border: 2px solid var(--primary-blue);
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+}
+
+.download-btn {
+    margin-top: 1rem;
+}
