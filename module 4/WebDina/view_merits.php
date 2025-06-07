@@ -61,7 +61,7 @@ while ($row = $merit_query->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <title>View Merits</title>
-    <link rel="stylesheet" href="meritawarded.css" />
+    <link rel="stylesheet" href="viewmerits.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <header>
