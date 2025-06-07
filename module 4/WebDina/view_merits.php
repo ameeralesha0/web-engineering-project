@@ -66,7 +66,7 @@ while ($row = $merit_query->fetch_assoc()) {
 </head>
 <header>
         <img src="petakom.jpg" alt="MyPetakom Logo" class="logo">
-        <h1>Claim Missing Merit</h1>
+        <h1>View Merits</h1>
         <a href="logout.php" class="logout-btn">Logout</a>
     </header>
 <body>
