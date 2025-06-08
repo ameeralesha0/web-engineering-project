@@ -164,11 +164,6 @@
   </a>
   <form action="logout.php"><button type="submit" class="red-btn">Logout</button></form>
 
-<!-- Main Content -->
-<div id="main" class="main-content">
-  <!-- Page content goes here -->
-</div>
-
 <script>
   function openNav() {
     document.getElementById("mySidepanel").style.width = "250px";
