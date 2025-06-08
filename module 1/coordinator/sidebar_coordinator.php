@@ -17,6 +17,7 @@
       width: 0;
       position: fixed;
       z-index: 1000;
+      justify-content: space-between; 
       height: 100vh;
       top: 0;
       left: 0;
@@ -203,10 +204,10 @@
   <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
     <i class="fas fa-cog"></i> Settings
   </a>
-  <a href="logout.php" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
+</div>
+<a href="logout.php" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
-</div>
 
 <script>
   function openNav() {
