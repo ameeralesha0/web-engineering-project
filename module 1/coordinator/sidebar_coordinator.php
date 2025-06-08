@@ -22,7 +22,6 @@
       left: 0;
       background-color: white;
       overflow-y: auto;
-      overflow-x: hidden;
       transition: 0.5s;
       padding-top: 20px;
       box-shadow: 2px 0 10px rgba(0,0,0,0.1);
