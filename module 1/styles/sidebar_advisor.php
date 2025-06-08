@@ -161,7 +161,6 @@
   <a href="/web-engineering-project/module2/src/pages/dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
     <i class="fas fa-tachometer-alt"></i> Dashboard
   </a>
-
   <!-- Module 2: Event Management -->
   <div class="sidebar-heading">Event Management</div>
   <a href="/web-engineering-project/module2/src/pages/events/create.php" class="<?= basename($_SERVER['PHP_SELF']) == 'events.php' ? 'active' : '' ?>">
@@ -179,7 +178,6 @@
   <a href="/web-engineering-project/module2/src/pages/qrcode/event_qrcode.php" class="<?= basename($_SERVER['PHP_SELF']) == 'event_qrcode.php' ? 'active' : '' ?>">
     <i class="fas fa-qrcode"></i> Event QR Code
   </a>
-
   <!-- Module 3: Attendance -->
   <div class="sidebar-heading">Attendance</div>
   <a href="../index.php">
@@ -188,7 +186,6 @@
   <a href="../qr_generator.php">
     <i class="fas fa-qrcode"></i> QR Generator
   </a>
-
   <!-- Module 4: Student Merit -->
   <div class="sidebar-heading">Student System</div>
   <a href="manage_merit.php" class="<?= basename($_SERVER['PHP_SELF']) == 'manage_merit.php' ? 'active' : '' ?>">
@@ -197,7 +194,6 @@
   <a href="student_records.php">
     <i class="fas fa-users"></i> Student Records
   </a>
-
   <!-- Reports & Settings -->
   <div class="sidebar-divider"></div>
   <a href="reports.php" class="<?= basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'active' : '' ?>">
@@ -206,16 +202,10 @@
   <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
     <i class="fas fa-cog"></i> Settings
   </a>
-
   <div class="sidebar-divider"></div>
   <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
-</div>
-
-<!-- Main Content -->
-<div id="main" class="main-content">
-  <!-- Page content goes here -->
 </div>
 
 <script>
