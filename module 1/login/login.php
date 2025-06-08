@@ -24,7 +24,7 @@ if (isset($_POST['login_user'])) {
             $result = mysqli_query($db, $query);
             if ($result && mysqli_num_rows($result) === 1) {
                 $user = mysqli_fetch_assoc($result);
-                if (password_verify($password, $user['student_pass'])) {
+                if (md5($password) == $user['student_pass']) {
                     $_SESSION['username'] = $username;
                     $_SESSION['email'] = $user['student_email'];
                     $_SESSION['student_id'] = $user['student_id'];
@@ -38,7 +38,7 @@ if (isset($_POST['login_user'])) {
             $result = mysqli_query($db, $query);
             if ($result && mysqli_num_rows($result) === 1) {
                 $user = mysqli_fetch_assoc($result);
-                if (password_verify($password, $user['advisor_pass'])) {
+                if (md5($password) == $user['advisor_pass']) {
                     $_SESSION['username'] = $username;
                     $_SESSION['email'] = $user['advisor_email'];
                     $_SESSION['role'] = 'advisor';
@@ -51,7 +51,7 @@ if (isset($_POST['login_user'])) {
             $result = mysqli_query($db, $query);
             if ($result && mysqli_num_rows($result) === 1) {
                 $user = mysqli_fetch_assoc($result);
-                if (password_verify($password, $user['staff_pass'])) {
+                if (md5($password) == $user['staff_pass']) {
                     $_SESSION['username'] = $username;
                     $_SESSION['email'] = $user['staff_email'];
                     $_SESSION['role'] = 'coordinator';
