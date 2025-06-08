@@ -13,7 +13,7 @@ body {
     background-color: #0056b3;
 }
 
-.details {
+.main-content {
     flex-grow: 1;
     padding: 40px;
 }
