@@ -146,7 +146,7 @@
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
 
   <div class="sidebar-logo-container">
-    <img src="logo-petakom.jpeg" alt="PETAKOM Logo" class="sidebar-logo">
+    <img src="logo-petakom.png" alt="PETAKOM Logo" class="sidebar-logo">
     <h4 class="advisor-brand"><i class="fas fa-user-tie"></i> Advisor</h4>
   </div>
 
