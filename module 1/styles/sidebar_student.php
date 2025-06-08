@@ -165,7 +165,7 @@
   <!-- Membership -->
   <div class="sidebar-heading">Membership</div>
   <a href="membership.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'membership.php' ? 'active' : '' ?>">
-    <i class=<i class="fa-solid fa-address-card"></i>></i> Membership
+    <i class="fa-solid fa-address-card"></i> Membership
   </a>
   <div class="sidebar-divider"></div>
   <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
