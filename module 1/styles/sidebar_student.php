@@ -154,16 +154,16 @@
   <!-- Main Section -->
   <div class="sidebar-heading">Main</div>
   <a href="accountdetails.php" class="<?= basename($_SERVER['PHP_SELF']) == 'accountdetails.php' ? 'active' : '' ?>">
-    <i class="fas fa-tachometer-alt"></i> Account Details
+    <i class="fa-solid fa-circle-user"></i> Account Details
   </a>
   <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
-    <i class="fas fa-tachometer-alt"></i> Manage Account
+    <i class="fa-solid fa-pen"></i> Manage Account
   </a>
   <a href="/web-engineering-project/module2/src/pages/dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
     <i class="fas fa-tachometer-alt"></i> Dashboard
   </a>
   <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
-    <i class="fas fa-tachometer-alt"></i> Logout
+    <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
 </div>
 
