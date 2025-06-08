@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userQuery = "SELECT * FROM $table WHERE $emailCol = '$email' LIMIT 1";
             $userResult = mysqli_query($db, $userQuery);
             if ($userResult && mysqli_num_rows($userResult) > 0) {
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $hashedPassword = md5($password);
 
             // Determine correct password column name
             $passwordCol = '';
