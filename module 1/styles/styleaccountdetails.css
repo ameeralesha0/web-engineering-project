@@ -1,5 +1,4 @@
 body {
-    display: flex;
     font-family: Arial;
     background-color: white;
     margin: 0;
@@ -16,6 +15,11 @@ body {
 .main-content {
     flex-grow: 1;
     padding: 40px;
+    margin-left: 60px;
+}
+
+body.sidepanel-open .main-content {
+    margin-left: 250px; /* When sidebar open */
 }
 
 .form-group {
