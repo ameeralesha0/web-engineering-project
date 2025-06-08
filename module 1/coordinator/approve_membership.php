@@ -62,6 +62,7 @@ if ($result) {
     <link rel="stylesheet" href="styleapprovemem.css">
 </head>
 <body>
+    <?php include('sidebar_coordinator.php'); ?> 
 <div class="sidebar">
     <img src="logo-petakom.png" alt="Logo">
     <form action="coordinatorpage.php">
