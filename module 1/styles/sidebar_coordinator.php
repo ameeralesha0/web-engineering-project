@@ -208,12 +208,6 @@
   <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
-
-</div>
-
-<!-- Main Content -->
-<div id="main" class="main-content">
-  <!-- Page content goes here -->
 </div>
 
 <script>
