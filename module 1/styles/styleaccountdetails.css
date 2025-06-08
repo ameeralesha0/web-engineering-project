@@ -30,14 +30,6 @@ body {
     background-color: #0056b3;
 }
 
-.red-btn {
-    background-color: #d9534f;
-    color: white;
-}
-.red-btn:hover {
-    background-color: #c9302c;
-}
-
 .main-content {
     flex-grow: 1;
     padding: 40px;
