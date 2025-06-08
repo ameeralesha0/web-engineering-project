@@ -20,7 +20,7 @@
       height: 100vh;
       top: 0;
       left: 0;
-      background-color: #2c3e50;
+      background-color: white;
       overflow-x: hidden;
       transition: 0.5s;
       padding-top: 20px;
@@ -31,15 +31,15 @@
       padding: 12px 15px 12px 35px;
       text-decoration: none;
       font-size: 16px;
-      color: #ecf0f1;
+      color: #373182;
       display: flex;
       align-items: center;
       transition: all 0.3s;
     }
 
     .sidepanel a:hover {
-      color: #f7dc6f;
-      background-color: #34495e;
+      color: #373182;
+      background-color: #b7f7eb;
     }
 
     .sidepanel a.active {
@@ -196,10 +196,12 @@
   <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
     <i class="fas fa-cog"></i> Settings
   </a>
+
   <div class="sidebar-divider"></div>
   <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
+
 </div>
 
 <!-- Main Content -->
