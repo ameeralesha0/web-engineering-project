@@ -33,6 +33,8 @@ body {
 .main-content {
     flex-grow: 1;
     padding: 40px;
+    margin-left: 60px;
+    margin-top: 60px;
 }
 
 .form-group {
