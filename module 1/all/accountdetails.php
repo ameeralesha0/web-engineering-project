@@ -29,7 +29,7 @@ $email = $_SESSION['email'] ?? null;
     <link rel="stylesheet" href="styleaccountdetails.css">
 </head>
 <body>
-
+<?php include('sidebar.php'); ?>
 <div class="main-content">
     <h2>Account Details</h2>
     <div class="form-group">
