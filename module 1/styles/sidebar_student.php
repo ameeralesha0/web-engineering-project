@@ -163,6 +163,7 @@
     <i class="fas fa-tachometer-alt"></i> Dashboard
   </a>
   <form action="logout.php"><button type="submit" class="red-btn">Logout</button></form>
+</div>
 
 <script>
   function openNav() {
