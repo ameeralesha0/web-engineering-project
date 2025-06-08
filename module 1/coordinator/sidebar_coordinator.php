@@ -17,12 +17,12 @@
       width: 0;
       position: fixed;
       z-index: 1000;
-      justify-content: space-between; 
       height: 100vh;
       top: 0;
       left: 0;
       background-color: white;
       overflow-y: auto;
+      overflow-x: hidden;
       transition: 0.5s;
       padding-top: 20px;
       box-shadow: 2px 0 10px rgba(0,0,0,0.1);
@@ -204,10 +204,10 @@
   <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
     <i class="fas fa-cog"></i> Settings
   </a>
-</div>
-<a href="logout.php" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
+  <a href="logout.php" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
+</div>
 
 <script>
   function openNav() {
