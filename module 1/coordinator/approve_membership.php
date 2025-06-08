@@ -63,30 +63,6 @@ if ($result) {
 </head>
 <body>
     <?php include('sidebar_coordinator.php'); ?> 
-<div class="sidebar">
-    <img src="logo-petakom.png" alt="Logo">
-    <form action="coordinatorpage.php">
-        <button type="submit" class="blue-btn">Main</button>
-    </form>
-    <button onclick="location.href='accountdetails.php'" class="blue-btn">Account Details</button>
-    <form action="profile.php">
-        <button type="submit" class="blue-btn">Manage Account</button>
-    </form>
-    <form action="merit.php">
-        <button type="submit" class="blue-btn">Manage Merit</button>
-    </form>
-    <form action="studentpage.php">
-        <button type="submit" class="blue-btn">Student Page</button>
-    </form>
-    <form action="report.php">
-        <button type="submit" class="blue-btn">Generate Report</button>
-    </form>
-    <form action="coordinatordashboard.php">
-        <button type="submit" class="blue-btn">Dashboard</button>
-    </form>
-    <button onclick="location.href='logout.php'" class="logout">Logout</button>
-</div>
-
 <div class="main">
     <div class="top-bar">
         <div class="title">Approve Membership</div>
