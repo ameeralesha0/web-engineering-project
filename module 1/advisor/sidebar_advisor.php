@@ -151,6 +151,7 @@
   </div>
 
   <!-- Main Section -->
+  <div class="sidebar-heading">Main</div>
   <a href="accountdetails.php" class="<?= basename($_SERVER['PHP_SELF']) == 'accountdetails.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-user"></i> Account Details
   </a>
