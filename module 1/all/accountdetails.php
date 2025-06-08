@@ -30,16 +30,16 @@ $email = $_SESSION['email'] ?? null;
 </head>
 <body>
     <?php 
-if ($role == 'student') {
-    include('sidebar_student.php');
-} elseif ($role == 'advisor') {
-    include('sidebar_advisor.php');
-} elseif ($role == 'coordinator') {
-    include('sidebar_coordinator.php');
-} else {
-    include('login.php'); 
-}
-?>
+    if ($role == 'student') {
+        include('sidebar_student.php');
+    } elseif ($role == 'advisor') {
+        include('sidebar_advisor.php');
+    } elseif ($role == 'coordinator') {
+        include('sidebar_coordinator.php');
+    } else {
+        include('login.php'); 
+    }
+    ?>
 <div class="main-content">
     <h2>Account Details</h2>
     <div class="form-group">
