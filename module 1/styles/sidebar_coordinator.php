@@ -127,6 +127,13 @@
         margin-left: 0;
       }
     }
+    .red-btn {
+    background-color: #d9534f;
+    color: white;
+  }
+  .red-btn:hover {
+    background-color: #c9302c;
+  }
   </style>
 </head>
 <body>
