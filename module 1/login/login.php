@@ -29,7 +29,7 @@ if (isset($_POST['login_user'])) {
                     $_SESSION['email'] = $user['student_email'];
                     $_SESSION['student_id'] = $user['student_id'];
                     $_SESSION['role'] = 'student';
-                    header('location: studentpage.php');
+                    header('location: accountdetails.php');
                     exit;
                 }
             }
@@ -42,7 +42,7 @@ if (isset($_POST['login_user'])) {
                     $_SESSION['username'] = $username;
                     $_SESSION['email'] = $user['advisor_email'];
                     $_SESSION['role'] = 'advisor';
-                    header('location: advisorpage.php');
+                    header('location: accountdetails.php');
                     exit;
                 }
             }
@@ -55,7 +55,7 @@ if (isset($_POST['login_user'])) {
                     $_SESSION['username'] = $username;
                     $_SESSION['email'] = $user['staff_email'];
                     $_SESSION['role'] = 'coordinator';
-                    header('location: coordinatorpage.php');
+                    header('location: accountdetails.php');
                     exit;
                 }
             }
