@@ -127,6 +127,13 @@
         margin-left: 0;
       }
     }
+    .red-btn {
+    background-color: #d9534f;
+    color: white;
+  }
+  .red-btn:hover {
+    background-color: #c9302c;
+  }
   </style>
 </head>
 <body>
@@ -139,7 +146,7 @@
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
 
   <div class="sidebar-logo-container">
-    <img src="petakomLogo.jpeg" alt="PETAKOM Logo" class="sidebar-logo">
+    <img src="logo-petakom.jpeg" alt="PETAKOM Logo" class="sidebar-logo">
     <h4 class="advisor-brand"><i class="fas fa-user-tie"></i> Advisor</h4>
   </div>
 
@@ -198,6 +205,11 @@
   </a>
   <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
     <i class="fas fa-cog"></i> Settings
+  </a>
+
+  <div class="sidebar-divider"></div>
+  <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
+    <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
 </div>
 
