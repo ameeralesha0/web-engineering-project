@@ -139,13 +139,26 @@
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
 
   <div class="sidebar-logo-container">
-    <img src="petakomLogo.jpeg" alt="PETAKOM Logo" class="sidebar-logo">
+    <img src="logo-petakom.png" alt="PETAKOM Logo" class="sidebar-logo">
     <h4 class="advisor-brand"><i class="fas fa-user-tie"></i> Admin</h4>
   </div>
 
+  <!-- Main Section -->
   <div class="sidebar-heading">Main</div>
-  <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
+  <a href="accountdetails.php" class="<?= basename($_SERVER['PHP_SELF']) == 'accountdetails.php' ? 'active' : '' ?>">
+    <i class="fa-solid fa-circle-user"></i> Account Details
+  </a>
+  <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
+    <i class="fa-solid fa-pen"></i> Manage Account
+  </a>
+  <a href="/web-engineering-project/module2/src/pages/dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
     <i class="fas fa-tachometer-alt"></i> Dashboard
+  </a>
+
+  <!-- Membership -->
+  <div class="sidebar-heading">Membership</div>
+  <a href="approve_membership.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'approve_membership.php' ? 'active' : '' ?>">
+    <i class="fa-solid fa-address-card"></i> Membership
   </a>
 
   <div class="sidebar-heading">Attendance</div>
@@ -182,6 +195,10 @@
   </a>
   <a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">
     <i class="fas fa-cog"></i> Settings
+  </a>
+  <div class="sidebar-divider"></div>
+  <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
+    <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
 </div>
 
