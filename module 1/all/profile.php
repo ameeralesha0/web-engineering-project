@@ -70,16 +70,16 @@ if ($result && $row = $result->fetch_assoc()) {
 </head>
 <body>
     <?php 
-if ($role == 'student') {
-    include('sidebar_student.php');
-} elseif ($role == 'advisor') {
-    include('sidebar_advisor.php');
-} elseif ($role == 'coordinator') {
-    include('sidebar_coordinator.php');
-} else {
-    include('login.php'); 
-}
-?>
+    if ($role == 'student') {
+        include('sidebar_student.php');
+    } elseif ($role == 'advisor') {
+        include('sidebar_advisor.php');
+    } elseif ($role == 'coordinator') {
+        include('sidebar_coordinator.php');
+    } else {
+        include('login.php'); 
+    }
+    ?>
     <div class="main-content">
         <h2>Manage Account</h2>
         <form method="post" action="update_profile.php"> <!-- Separate update script recommended -->
