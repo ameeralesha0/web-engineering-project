@@ -152,16 +152,15 @@
   </div>
 
   <!-- Main Section -->
+   <a href="/web-engineering-project/module2/src/pages/dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
+    <i class="fas fa-tachometer-alt"></i> Dashboard
+  </a>
   <div class="sidebar-heading">Main</div>
   <a href="accountdetails.php" class="<?= basename($_SERVER['PHP_SELF']) == 'accountdetails.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-user"></i> Account Details
   </a>
   <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-pen"></i> Manage Account
-  </a>
-  <a href="/web-engineering-project/module2/src/pages/dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
-    <i class="fas fa-tachometer-alt"></i> Dashboard
-  </a>
   <!-- Membership -->
   <div class="sidebar-heading">Membership</div>
   <a href="membership.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'membership.php' ? 'active' : '' ?>">
