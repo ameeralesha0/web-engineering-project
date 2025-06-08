@@ -21,6 +21,7 @@
       top: 0;
       left: 0;
       background-color: white;
+      overflow-y: auto;
       overflow-x: hidden;
       transition: 0.5s;
       padding-top: 20px;
