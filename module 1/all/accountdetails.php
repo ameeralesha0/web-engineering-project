@@ -30,7 +30,7 @@ $email = $_SESSION['email'] ?? null;
 </head>
 <body>
     <?php include('sidebar_student.php'); ?>
-<div class="details">
+<div class="main-content">
     <h2>Account Details</h2>
     <div class="form-group">
         <label>Username:</label>
