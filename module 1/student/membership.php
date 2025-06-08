@@ -88,6 +88,7 @@ $fetch->close();
     <link rel="stylesheet" href="membershipstyle.css">
 </head>
 <body>
+    <?php include('sidebar_student.php'); ?>
     <div class="form-container">
         <div class="form-header">
             <img src="logo-petakom.png" alt="MyPetakom Logo" class="logo">
