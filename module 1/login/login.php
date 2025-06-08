@@ -29,7 +29,7 @@ if (isset($_POST['login_user'])) {
                     $_SESSION['email'] = $user['student_email'];
                     $_SESSION['student_id'] = $user['student_id'];
                     $_SESSION['role'] = 'student';
-                    header('location: accountdetails.php');
+                    header('location: sidebar_student.php');
                     exit;
                 }
             }
