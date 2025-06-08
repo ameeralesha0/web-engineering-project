@@ -61,12 +61,12 @@ while ($row = $merit_query->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <title>View Merits</title>
-    <link rel="stylesheet" href="meritawarded.css" />
+    <link rel="stylesheet" href="viewmerits.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <header>
         <img src="petakom.jpg" alt="MyPetakom Logo" class="logo">
-        <h1>Claim Missing Merit</h1>
+        <h1>View Merits</h1>
         <a href="logout.php" class="logout-btn">Logout</a>
     </header>
 <body>

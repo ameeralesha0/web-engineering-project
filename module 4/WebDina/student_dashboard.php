@@ -33,24 +33,47 @@ $eventsParticipated = 0;
 
 try {
     // Fetch Total Merit
-    $stmt_total_merit = $pdo->prepare("SELECT SUM(merit_points) AS total_points FROM awarded_merits WHERE student_id = :student_id");
+    $stmt_total_merit = $pdo->prepare("
+        SELECT SUM(CAST(merit_score AS UNSIGNED)) AS total_points 
+        FROM merit 
+        WHERE student_id = :student_id AND approval_status = 'Approved'
+    ");
     $stmt_total_merit->execute([':student_id' => $studentID]);
     $result_total_merit = $stmt_total_merit->fetch(PDO::FETCH_ASSOC);
     $totalMerit = $result_total_merit['total_points'] ?? 0;
 
-    // Fetch Current Semester
-    $stmt_semester = $pdo->prepare("SELECT current_semester FROM students WHERE student_id = :student_id");
+    // Fetch Current Semester (latest one participated in)
+    $stmt_semester = $pdo->prepare("
+        SELECT semester 
+        FROM merit 
+        WHERE student_id = :student_id 
+        ORDER BY semester DESC 
+        LIMIT 1
+    ");
     $stmt_semester->execute([':student_id' => $studentID]);
     $result_semester = $stmt_semester->fetch(PDO::FETCH_ASSOC);
-    $currentSemester = $result_semester['current_semester'] ?? "N/A";
+    $currentSemester = $result_semester['semester'] ?? "N/A";
 
     // Fetch Events Participated
-    $stmt_events = $pdo->prepare("SELECT COUNT(DISTINCT event_id) AS event_count FROM awarded_merits WHERE student_id = :student_id");
+    $stmt_events = $pdo->prepare("
+        SELECT COUNT(DISTINCT event_id) AS event_count 
+        FROM merit 
+        WHERE student_id = :student_id AND approval_status = 'Approved'
+    ");
     $stmt_events->execute([':student_id' => $studentID]);
     $result_events = $stmt_events->fetch(PDO::FETCH_ASSOC);
     $eventsParticipated = $result_events['event_count'] ?? 0;
 
+    $stmt_name = $pdo->prepare("SELECT student_name FROM student WHERE student_id = :student_id");
+    $stmt_name->execute([':student_id' => $studentID]);
+    $result_name = $stmt_name->fetch(PDO::FETCH_ASSOC);
+    $studentName = $result_name['student_name'] ?? "Student";
+
+    
 } catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+catch (PDOException $e) {
     error_log("Error fetching dashboard data: " . $e->getMessage());
     echo "<p style='color: red; text-align: center;'>An error occurred while loading dashboard data. Please try again.</p>";
 }
