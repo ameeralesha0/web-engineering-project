@@ -95,7 +95,7 @@
 
     .advisor-brand {
       font-size: 1.1rem;
-      color: #fff;
+      color: rgb(117, 194, 136);
       margin-top: 10px;
     }
 
