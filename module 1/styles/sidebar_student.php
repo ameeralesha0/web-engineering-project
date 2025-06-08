@@ -162,6 +162,12 @@
   <a href="/web-engineering-project/module2/src/pages/dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
     <i class="fas fa-tachometer-alt"></i> Dashboard
   </a>
+  <!-- Membership -->
+  <div class="sidebar-heading">Membership</div>
+  <a href="membership.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'membership.php' ? 'active' : '' ?>">
+    <i class=<i class="fa-solid fa-address-card"></i>></i> Membership
+  </a>
+  <div class="sidebar-divider"></div>
   <a href="logout.php" button type="submit" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">
     <i class="fa-solid fa-circle-xmark"></i> Logout
   </a>
