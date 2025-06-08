@@ -127,6 +127,14 @@
         margin-left: 0;
       }
     }
+    
+  .red-btn {
+    background-color: #d9534f;
+    color: white;
+  }
+  .red-btn:hover {
+    background-color: #c9302c;
+  }
   </style>
 </head>
 <body>
@@ -154,6 +162,7 @@
   <a href="/web-engineering-project/module2/src/pages/dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
     <i class="fas fa-tachometer-alt"></i> Dashboard
   </a>
+  <form action="logout.php"><button type="submit" class="red-btn">Logout</button></form>
 
 <!-- Main Content -->
 <div id="main" class="main-content">
